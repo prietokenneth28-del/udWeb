@@ -1,0 +1,72 @@
+/* Estilos para la tarjeta personalizada */
+.custom-card {
+    border: 2px solid black !important;
+    border-radius: 0 !important; /* Esquinas cuadradas */
+    background-color: #fcd5b5; /* Color melocotón de fondo */
+    box-shadow: none;
+}
+
+/* El encabezado dividido en dos columnas */
+.custom-card .card-header {
+    padding: 0;
+    background-color: transparent;
+    border-bottom: 2px solid black;
+    border-radius: 0;
+    display: flex;
+}
+
+/* Sección izquierda del encabezado */
+.custom-card .header-left {
+    flex: 1;
+    border-right: 2px solid black;
+    background-color: #fcd5b5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+}
+
+/* Sección derecha del encabezado (el número) */
+.custom-card .header-right {
+    flex: 1;
+    background-color: #c95c10; /* Naranja oscuro */
+    color: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-family: serif;
+    font-size: 1.2rem;
+}
+
+/* El cuerpo de la tarjeta */
+.custom-card .card-body {
+    padding: 1.5rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* El texto de la materia */
+.custom-card .card-title {
+    margin: 0;
+    color: #002d62; /* Azul marino */
+    font-family: "Times New Roman", Times, serif;
+    font-weight: bold;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    text-shadow: 0px 0px 1px rgba(0,0,0,0.3); /* Un ligero sombreado para darle grosor */
+}
+
+/* Estilo para simular el check de la imagen */
+.custom-checkbox {
+    background-color: black;
+    color: #ff9900; /* Naranja del check */
+    width: 24px;
+    height: 24px;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #000;
+}
