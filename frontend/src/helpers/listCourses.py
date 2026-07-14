@@ -48,7 +48,7 @@ courses = [
     {'cd': 19716, 'name': "Máquinas Eléctricas", 'credits': 2, 'clasification': "Obligatorio Básico", 'semester': 6, 'color': "success"},
     {'cd': 1824, 'name': "Máquinas Hidráulicas", 'credits': 3, 'clasification': "Componente Propedéutico", 'semester': 6, 'color': "success"},
     {'cd': "-", 'name': "Electiva intriseca 3", 'credits': 2, 'clasification': "Electivo Intrinseco", 'semester': 6, 'color': "light"},
-    {'cd': "-", 'name': "Electiva extrinseca", 'credits': 2, 'clasification': "Obligatorio Básico", 'semester': 6, 'color': "light"}
+    {'cd': "-", 'name': "Electiva extrinseca", 'credits': 2, 'clasification': "Electivo Extrinseco", 'semester': 6, 'color': "light"}
 ]
 
 # 2. Lógica para construir el HTML
@@ -65,7 +65,7 @@ for semester_num in range(1, 7):
     # Iniciar la columna y la tarjeta del semestre
     html_output += f"""
                             <!-- Columna {semester_num} -->
-                            <div class="col">
+                            <div class="col-12 col-md-6 col-lg-2">
                                 <div class="card text-center mt-1">
                                     <div class="card-header">
                                         <h4>Semestre {semester_num}</h4>
@@ -77,7 +77,23 @@ for semester_num in range(1, 7):
         name = course['name'].upper() # Nombre en mayúsculas como en tu ejemplo
         credits = course['credits']
         cod = course['cd']
-        clasification = course['clasification']
+        type = course['clasification']
+
+        if type == "Obligatorio Básico":
+            type = "OB" 
+
+        elif type == "Obligatorio Complementario":
+            type = "OC" 
+
+        elif type == "Electivo Intrinseco":
+            type = "EI" 
+
+        elif type == "Electivo Extrinseco":
+            type = "EE"
+
+        else:
+            type = "CP" 
+                 
         # Agregar mt-3 a la primera tarjeta del semestre
         margin_top = " mt-3" if index == 0 else ""
         
@@ -85,10 +101,18 @@ for semester_num in range(1, 7):
                                     <!-- Tarjeta {index + 1} -->
                                     <div class="card border-{color} text-{color} mb-3{margin_top}">
                                         <div class="card-header border-{color}">
-                                            {cod}
+                                            <div class="row">
+                                                <div class="col">
+                                                        Cod: {cod}
+                                                </div>
+                                                <div class="col">
+                                                        {type}
+                                                </div>
+                                            </div>
+                                            
                                         </div>
                                         <div class="card-body">
-                                            <h5 class="card-title">{name}</h5>
+                                            <h6 class="card-title">{name}</h6>
                                         </div>
                                         <div class="card-footer border-{color} text-{color}">
                                             Creditos: {credits}
@@ -96,7 +120,7 @@ for semester_num in range(1, 7):
                                     </div>"""
                                     
     # Cerrar la tarjeta del semestre y agregar el total de créditos
-    html_output += f"""s
+    html_output += f"""
                                     <div class="card-footer border-secondary text-secondary">
                                             <h5>Total de creditos: {total_credits}</h5>
                                     </div>

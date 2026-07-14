@@ -14,6 +14,70 @@
 <body>
     <div class="container-fluid">
         <main>
+            <header class="d-flex flex-wrap justify-content-between align-items-center mt-4 mb-3 gap-2">
+                <h1 class="h3 mb-0">Plan de estudios &mdash; Ingeniería Mecánica</h1>
+                <button id="btn-pdf" type="button" class="btn btn-outline-light btn-sm">
+                    <i class="bi bi-file-earmark-pdf"></i> Descargar PDF
+                </button>
+            </header>
+
+            <!-- Panel de progreso -->
+            <div class="row g-3 mb-3" id="dashboard">
+                <div class="col-6 col-lg-3">
+                    <div class="card text-center h-100">
+                        <div class="card-body">
+                            <h6 class="card-subtitle text-body-secondary mb-1">Créditos totales</h6>
+                            <p class="fs-4 mb-0" id="stat-total">160</p>
+                            <small class="text-body-secondary" id="stat-total-breakdown"></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="card text-center h-100">
+                        <div class="card-body">
+                            <h6 class="card-subtitle text-body-secondary mb-1">Créditos aprobados</h6>
+                            <p class="fs-4 mb-0" id="stat-approved">0</p>
+                            <small class="text-body-secondary" id="stat-approved-breakdown"></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="card text-center h-100">
+                        <div class="card-body">
+                            <h6 class="card-subtitle text-body-secondary mb-1">% avance</h6>
+                            <p class="fs-4 mb-0" id="stat-percent">0%</p>
+                            <div class="progress" role="progressbar" aria-label="Avance del plan" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="height: 6px;">
+                                <div class="progress-bar" id="stat-progress-bar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="card text-center h-100">
+                        <div class="card-body">
+                            <h6 class="card-subtitle text-body-secondary mb-1">Por cursar</h6>
+                            <p class="fs-4 mb-0" id="stat-remaining">160</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Leyenda -->
+            <div class="card mb-4" id="legend-card">
+                <div class="card-body py-2">
+                    <div class="d-flex flex-wrap gap-3 justify-content-center align-items-center small">
+                        <span class="legend-item"><span class="legend-swatch border-danger"></span> Física y Matemática</span>
+                        <span class="legend-item"><span class="legend-swatch border-warning"></span> Procesos de Fabricación</span>
+                        <span class="legend-item"><span class="legend-swatch border-success"></span> Energías</span>
+                        <span class="legend-item"><span class="legend-swatch border-primary"></span> Diseño Mecánico y Programación</span>
+                        <span class="legend-item"><span class="legend-swatch border-secondary"></span> Lenguaje y Ciencias Sociales</span>
+                        <span class="legend-item"><span class="legend-swatch border-light"></span> Electivas / Trabajo de grado</span>
+                        <span class="vr d-none d-md-inline"></span>
+                        <span class="text-body-secondary">OB: Obligatoria &nbsp; OC: Obl. complementaria &nbsp; EI: Electiva intrínseca &nbsp; EE: Electiva extrínseca &nbsp; CP: Componente propedéutico</span>
+                    </div>
+                </div>
+            </div>
+
             <div class="card text-center mt-4">
                 <div class="card-header">
                     <h3>Ciclo Tecnológico (106 Créditos)</h3>
@@ -22,13 +86,1608 @@
                     <div class="container text-center">
                         <div class="row align-items-start">
                                       
-                            <script>
-                                fetch('coursesCards.htm')
-                                    .then(response => response.text())
-                                    .then(data => {
-                                        document.getElementById('mi-contenido').innerHTML = data;
-                                    });
-                            </script>
+
+                            
+                          
+                            <!-- Columna 1 -->
+                            <div class="col-12 col-md-6 col-lg-2">
+                                <div class="card text-center mt-1">
+                                    <div class="card-header">
+                                        <h4>Semestre 1</h4>
+                                    </div>
+                                    <!-- Tarjeta 1 -->
+                                    <div class="card course-card border-danger text-danger mb-3 mt-3" data-cycle="tec" data-credits="4" id="tec-1">
+                                        <div class="card-header border-danger">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: CÁLCULO DIFERENCIAL">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 1
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">CÁLCULO DIFERENCIAL</h5>
+                                        </div>
+                                        <div class="card-footer border-danger text-danger">
+                                            Creditos: 4
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 2 -->
+                                    <div class="card course-card border-secondary text-secondary mb-3" data-cycle="tec" data-credits="1" id="tec-2">
+                                        <div class="card-header border-secondary">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: CÁTEDRA FRANCISCO JOSÉ DE CALDAS">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 4
+                                                </div>
+                                                <div class="col-auto">
+                                                    OC
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">CÁTEDRA FRANCISCO JOSÉ DE CALDAS</h5>
+                                        </div>
+                                        <div class="card-footer border-secondary text-secondary">
+                                            Creditos: 1
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 3 -->
+                                    <div class="card course-card border-danger text-danger mb-3" data-cycle="tec" data-credits="3" id="tec-3">
+                                        <div class="card-header border-danger">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: ÁLGEBRA LINEAL">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 9
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">ÁLGEBRA LINEAL</h5>
+                                        </div>
+                                        <div class="card-footer border-danger text-danger">
+                                            Creditos: 3
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 4 -->
+                                    <div class="card course-card border-secondary text-secondary mb-3" data-cycle="tec" data-credits="3" id="tec-4">
+                                        <div class="card-header border-secondary">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: PRODUCCIÓN Y COMPRENSIÓN DE TEXTOS I">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 1054
+                                                </div>
+                                                <div class="col-auto">
+                                                    OC
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">PRODUCCIÓN Y COMPRENSIÓN DE TEXTOS I</h5>
+                                        </div>
+                                        <div class="card-footer border-secondary text-secondary">
+                                            Creditos: 3
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 5 -->
+                                    <div class="card course-card border-secondary text-secondary mb-3" data-cycle="tec" data-credits="2" id="tec-5">
+                                        <div class="card-header border-secondary">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: ÉTICA Y SOCIEDAD">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 1075
+                                                </div>
+                                                <div class="col-auto">
+                                                    OC
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">ÉTICA Y SOCIEDAD</h5>
+                                        </div>
+                                        <div class="card-footer border-secondary text-secondary">
+                                            Creditos: 2
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 6 -->
+                                    <div class="card course-card border-warning text-warning mb-3" data-cycle="tec" data-credits="2" id="tec-6">
+                                        <div class="card-header border-warning">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: DIBUJO TÉCNICO">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 1411
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">DIBUJO TÉCNICO</h5>
+                                        </div>
+                                        <div class="card-footer border-warning text-warning">
+                                            Creditos: 2
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 7 -->
+                                    <div class="card course-card border-warning text-warning mb-3" data-cycle="tec" data-credits="1" id="tec-7">
+                                        <div class="card-header border-warning">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: INTRODUCCIÓN A LA MECÁNICA INDUSTRIAL">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 19701
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">INTRODUCCIÓN A LA MECÁNICA INDUSTRIAL</h5>
+                                        </div>
+                                        <div class="card-footer border-warning text-warning">
+                                            Creditos: 1
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 8 -->
+                                    <div class="card course-card border-secondary text-secondary mb-3" data-cycle="tec" data-credits="2" id="tec-8">
+                                        <div class="card-header border-secondary">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: SEGUNDA LENGUA I - INGLÉS">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 9901
+                                                </div>
+                                                <div class="col-auto">
+                                                    OC
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">SEGUNDA LENGUA I - INGLÉS</h5>
+                                        </div>
+                                        <div class="card-footer border-secondary text-secondary">
+                                            Creditos: 2
+                                        </div>
+                                    </div>
+                                    <div class="card-footer border-secondary text-secondary">
+                                            <h5>Total de creditos: 18</h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Columna 2 -->
+                            <div class="col-12 col-md-6 col-lg-2">
+                                <div class="card text-center mt-1">
+                                    <div class="card-header">
+                                        <h4>Semestre 2</h4>
+                                    </div>
+                                    <!-- Tarjeta 1 -->
+                                    <div class="card course-card border-danger text-danger mb-3 mt-3" data-cycle="tec" data-credits="3" id="tec-9">
+                                        <div class="card-header border-danger">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: FÍSICA I: MECÁNICA NEWTONIANA">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 3
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">FÍSICA I: MECÁNICA NEWTONIANA</h5>
+                                        </div>
+                                        <div class="card-footer border-danger text-danger">
+                                            Creditos: 3
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 2 -->
+                                    <div class="card course-card border-danger text-danger mb-3" data-cycle="tec" data-credits="3" id="tec-10">
+                                        <div class="card-header border-danger">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: CÁLCULO INTEGRAL">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 7
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">CÁLCULO INTEGRAL</h5>
+                                        </div>
+                                        <div class="card-footer border-danger text-danger">
+                                            Creditos: 3
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 3 -->
+                                    <div class="card course-card border-secondary text-secondary mb-3" data-cycle="tec" data-credits="1" id="tec-11">
+                                        <div class="card-header border-secondary">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: CÁTEDRA DEMOCRACIA Y CIUDADANÍA">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 12
+                                                </div>
+                                                <div class="col-auto">
+                                                    OC
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">CÁTEDRA DEMOCRACIA Y CIUDADANÍA</h5>
+                                        </div>
+                                        <div class="card-footer border-secondary text-secondary">
+                                            Creditos: 1
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 4 -->
+                                    <div class="card course-card border-secondary text-secondary mb-3" data-cycle="tec" data-credits="2" id="tec-12">
+                                        <div class="card-header border-secondary">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: PRODUCCIÓN Y COMPRENSIÓN DE TEXTOS II">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 1056
+                                                </div>
+                                                <div class="col-auto">
+                                                    OC
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">PRODUCCIÓN Y COMPRENSIÓN DE TEXTOS II</h5>
+                                        </div>
+                                        <div class="card-footer border-secondary text-secondary">
+                                            Creditos: 2
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 5 -->
+                                    <div class="card course-card border-warning text-warning mb-3" data-cycle="tec" data-credits="3" id="tec-13">
+                                        <div class="card-header border-warning">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: MATERIALES METÁLICOS">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 19702
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">MATERIALES METÁLICOS</h5>
+                                        </div>
+                                        <div class="card-footer border-warning text-warning">
+                                            Creditos: 3
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 6 -->
+                                    <div class="card course-card border-warning text-warning mb-3" data-cycle="tec" data-credits="2" id="tec-14">
+                                        <div class="card-header border-warning">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: DIBUJO DE ELEMENTOS DE MÁQUINAS">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 19703
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">DIBUJO DE ELEMENTOS DE MÁQUINAS</h5>
+                                        </div>
+                                        <div class="card-footer border-warning text-warning">
+                                            Creditos: 2
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 7 -->
+                                    <div class="card course-card border-primary text-primary mb-3" data-cycle="tec" data-credits="1" id="tec-15">
+                                        <div class="card-header border-primary">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: FUNDAMENTOS DE PROGRAMACIÓN">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 19704
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">FUNDAMENTOS DE PROGRAMACIÓN</h5>
+                                        </div>
+                                        <div class="card-footer border-primary text-primary">
+                                            Creditos: 1
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 8 -->
+                                    <div class="card course-card border-secondary text-secondary mb-3" data-cycle="tec" data-credits="2" id="tec-16">
+                                        <div class="card-header border-secondary">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: SEGUNDA LENGUA II - INGLÉS">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 9903
+                                                </div>
+                                                <div class="col-auto">
+                                                    OC
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">SEGUNDA LENGUA II - INGLÉS</h5>
+                                        </div>
+                                        <div class="card-footer border-secondary text-secondary">
+                                            Creditos: 2
+                                        </div>
+                                    </div>
+                                    <div class="card-footer border-secondary text-secondary">
+                                            <h5>Total de creditos: 17</h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Columna 3 -->
+                            <div class="col-12 col-md-6 col-lg-2">
+                                <div class="card text-center mt-1">
+                                    <div class="card-header">
+                                        <h4>Semestre 3</h4>
+                                    </div>
+                                    <!-- Tarjeta 1 -->
+                                    <div class="card course-card border-danger text-danger mb-3 mt-3" data-cycle="tec" data-credits="3" id="tec-17">
+                                        <div class="card-header border-danger">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: FÍSICA II: ELECTROMAGNETISMO">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 13
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">FÍSICA II: ELECTROMAGNETISMO</h5>
+                                        </div>
+                                        <div class="card-footer border-danger text-danger">
+                                            Creditos: 3
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 2 -->
+                                    <div class="card course-card border-secondary text-secondary mb-3" data-cycle="tec" data-credits="2" id="tec-18">
+                                        <div class="card-header border-secondary">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: CIENCIA TECNOLOGÍA Y SOCIEDAD">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 1060
+                                                </div>
+                                                <div class="col-auto">
+                                                    OC
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">CIENCIA TECNOLOGÍA Y SOCIEDAD</h5>
+                                        </div>
+                                        <div class="card-footer border-secondary text-secondary">
+                                            Creditos: 2
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 3 -->
+                                    <div class="card course-card border-primary text-primary mb-3" data-cycle="tec" data-credits="3" id="tec-19">
+                                        <div class="card-header border-primary">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: ESTATICA">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 1421
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">ESTATICA</h5>
+                                        </div>
+                                        <div class="card-footer border-primary text-primary">
+                                            Creditos: 3
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 4 -->
+                                    <div class="card course-card border-warning text-warning mb-3" data-cycle="tec" data-credits="2" id="tec-20">
+                                        <div class="card-header border-warning">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: MATERIALES POLIMÉRICOS Y COMPUESTOS">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 19705
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">MATERIALES POLIMÉRICOS Y COMPUESTOS</h5>
+                                        </div>
+                                        <div class="card-footer border-warning text-warning">
+                                            Creditos: 2
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 5 -->
+                                    <div class="card course-card border-warning text-warning mb-3" data-cycle="tec" data-credits="2" id="tec-21">
+                                        <div class="card-header border-warning">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: DIBUJO DE TALLER INDUSTRIAL">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 19706
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">DIBUJO DE TALLER INDUSTRIAL</h5>
+                                        </div>
+                                        <div class="card-footer border-warning text-warning">
+                                            Creditos: 2
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 6 -->
+                                    <div class="card course-card border-warning text-warning mb-3" data-cycle="tec" data-credits="1" id="tec-22">
+                                        <div class="card-header border-warning">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: METROLOGÍA DIMENSIONAL">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 19707
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">METROLOGÍA DIMENSIONAL</h5>
+                                        </div>
+                                        <div class="card-footer border-warning text-warning">
+                                            Creditos: 1
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 7 -->
+                                    <div class="card course-card border-secondary text-secondary mb-3" data-cycle="tec" data-credits="2" id="tec-23">
+                                        <div class="card-header border-secondary">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: SEGUNDA LENGUA III - INGLÉS">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 9903
+                                                </div>
+                                                <div class="col-auto">
+                                                    OC
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">SEGUNDA LENGUA III - INGLÉS</h5>
+                                        </div>
+                                        <div class="card-footer border-secondary text-secondary">
+                                            Creditos: 2
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 8 -->
+                                    <div class="card course-card border-warning text-warning mb-3" data-cycle="tec" data-credits="3" id="tec-24">
+                                        <div class="card-header border-warning">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: PROCESOS DE MECANIZADO I">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 19708
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">PROCESOS DE MECANIZADO I</h5>
+                                        </div>
+                                        <div class="card-footer border-warning text-warning">
+                                            Creditos: 3
+                                        </div>
+                                    </div>
+                                    <div class="card-footer border-secondary text-secondary">
+                                            <h5>Total de creditos: 18</h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Columna 4 -->
+                            <div class="col-12 col-md-6 col-lg-2">
+                                <div class="card text-center mt-1">
+                                    <div class="card-header">
+                                        <h4>Semestre 4</h4>
+                                    </div>
+                                    <!-- Tarjeta 1 -->
+                                    <div class="card course-card border-danger text-danger mb-3 mt-3" data-cycle="tec" data-credits="3" id="tec-25">
+                                        <div class="card-header border-danger">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: CÁLCULO MULTIVARIADO">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 16
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">CÁLCULO MULTIVARIADO</h5>
+                                        </div>
+                                        <div class="card-footer border-danger text-danger">
+                                            Creditos: 3
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 2 -->
+                                    <div class="card course-card border-success text-success mb-3" data-cycle="tec" data-credits="3" id="tec-26">
+                                        <div class="card-header border-success">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: MECANICA DE FLUIDOS">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 1433
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">MECANICA DE FLUIDOS</h5>
+                                        </div>
+                                        <div class="card-footer border-success text-success">
+                                            Creditos: 3
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 3 -->
+                                    <div class="card course-card border-primary text-primary mb-3" data-cycle="tec" data-credits="3" id="tec-27">
+                                        <div class="card-header border-primary">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: RESISTENCIA DE MATERIALES">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 1436
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">RESISTENCIA DE MATERIALES</h5>
+                                        </div>
+                                        <div class="card-footer border-primary text-primary">
+                                            Creditos: 3
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 4 -->
+                                    <div class="card course-card border-warning text-warning mb-3" data-cycle="tec" data-credits="3" id="tec-28">
+                                        <div class="card-header border-warning">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: PROCESOS DE MECANIZADO II">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 19709
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">PROCESOS DE MECANIZADO II</h5>
+                                        </div>
+                                        <div class="card-footer border-warning text-warning">
+                                            Creditos: 3
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 5 -->
+                                    <div class="card course-card border-warning text-warning mb-3" data-cycle="tec" data-credits="3" id="tec-29">
+                                        <div class="card-header border-warning">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: DINÁMICA DE MECANISMOS">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 19710
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">DINÁMICA DE MECANISMOS</h5>
+                                        </div>
+                                        <div class="card-footer border-warning text-warning">
+                                            Creditos: 3
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 6 -->
+                                    <div class="card course-card border-danger text-danger mb-3" data-cycle="tec" data-credits="3" id="tec-30">
+                                        <div class="card-header border-danger">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: FÍSICA III: ONDAS Y FÍSICA MODERNA">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 1428
+                                                </div>
+                                                <div class="col-auto">
+                                                    CP
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">FÍSICA III: ONDAS Y FÍSICA MODERNA</h5>
+                                        </div>
+                                        <div class="card-footer border-danger text-danger">
+                                            Creditos: 3
+                                        </div>
+                                    </div>
+                                    <div class="card-footer border-secondary text-secondary">
+                                            <h5>Total de creditos: 18</h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Columna 5 -->
+                            <div class="col-12 col-md-6 col-lg-2">
+                                <div class="card text-center mt-1">
+                                    <div class="card-header">
+                                        <h4>Semestre 5</h4>
+                                    </div>
+                                    <!-- Tarjeta 1 -->
+                                    <div class="card course-card border-danger text-danger mb-3 mt-3" data-cycle="tec" data-credits="3" id="tec-31">
+                                        <div class="card-header border-danger">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: ECUACIONES DIFERENCIALES">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 88
+                                                </div>
+                                                <div class="col-auto">
+                                                    CP
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">ECUACIONES DIFERENCIALES</h5>
+                                        </div>
+                                        <div class="card-footer border-danger text-danger">
+                                            Creditos: 3
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 2 -->
+                                    <div class="card course-card border-success text-success mb-3" data-cycle="tec" data-credits="3" id="tec-32">
+                                        <div class="card-header border-success">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: TERMODINÁMICA">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 1426
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">TERMODINÁMICA</h5>
+                                        </div>
+                                        <div class="card-footer border-success text-success">
+                                            Creditos: 3
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 3 -->
+                                    <div class="card course-card border-danger text-danger mb-3" data-cycle="tec" data-credits="2" id="tec-33">
+                                        <div class="card-header border-danger">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: MANTENIMIENTO DE MÁQUINAS">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 19711
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">MANTENIMIENTO DE MÁQUINAS</h5>
+                                        </div>
+                                        <div class="card-footer border-danger text-danger">
+                                            Creditos: 2
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 4 -->
+                                    <div class="card course-card border-warning text-warning mb-3" data-cycle="tec" data-credits="3" id="tec-34">
+                                        <div class="card-header border-warning">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: PROCESOS DE CONFORMADO">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 19712
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">PROCESOS DE CONFORMADO</h5>
+                                        </div>
+                                        <div class="card-footer border-warning text-warning">
+                                            Creditos: 3
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 5 -->
+                                    <div class="card course-card border-primary text-primary mb-3" data-cycle="tec" data-credits="3" id="tec-35">
+                                        <div class="card-header border-primary">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: ELEMENTOS DE MÁQUINAS I">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 19713
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">ELEMENTOS DE MÁQUINAS I</h5>
+                                        </div>
+                                        <div class="card-footer border-primary text-primary">
+                                            Creditos: 3
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 6 -->
+                                    <div class="card course-card border-light text-light mb-3" data-cycle="tec" data-credits="2" id="tec-36">
+                                        <div class="card-header border-light">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: ELECTIVA INTRISECA 1">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: -
+                                                </div>
+                                                <div class="col-auto">
+                                                    EI
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">ELECTIVA INTRISECA 1</h5>
+                                        </div>
+                                        <div class="card-footer border-light text-light">
+                                            Creditos: 2
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 7 -->
+                                    <div class="card course-card border-light text-light mb-3" data-cycle="tec" data-credits="2" id="tec-37">
+                                        <div class="card-header border-light">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: ELECTIVA INTRISECA 2">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: -
+                                                </div>
+                                                <div class="col-auto">
+                                                    EI
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">ELECTIVA INTRISECA 2</h5>
+                                        </div>
+                                        <div class="card-footer border-light text-light">
+                                            Creditos: 2
+                                        </div>
+                                    </div>
+                                    <div class="card-footer border-secondary text-secondary">
+                                            <h5>Total de creditos: 18</h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Columna 6 -->
+                            <div class="col-12 col-md-6 col-lg-2">
+                                <div class="card text-center mt-1">
+                                    <div class="card-header">
+                                        <h4>Semestre 6</h4>
+                                    </div>
+                                    <!-- Tarjeta 1 -->
+                                    <div class="card course-card border-light text-light mb-3 mt-3" data-cycle="tec" data-credits="2" id="tec-38">
+                                        <div class="card-header border-light">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: TRABAJO DE GRADO TECNOLÓGICO">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 1446
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">TRABAJO DE GRADO TECNOLÓGICO</h5>
+                                        </div>
+                                        <div class="card-footer border-light text-light">
+                                            Creditos: 2
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 2 -->
+                                    <div class="card course-card border-warning text-warning mb-3" data-cycle="tec" data-credits="3" id="tec-39">
+                                        <div class="card-header border-warning">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: DISEÑO DE PROCESOS DE FABRICACIÓN">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 19714
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">DISEÑO DE PROCESOS DE FABRICACIÓN</h5>
+                                        </div>
+                                        <div class="card-footer border-warning text-warning">
+                                            Creditos: 3
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 3 -->
+                                    <div class="card course-card border-primary text-primary mb-3" data-cycle="tec" data-credits="3" id="tec-40">
+                                        <div class="card-header border-primary">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: ELEMENTOS DE MÁQUINAS II">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 19715
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">ELEMENTOS DE MÁQUINAS II</h5>
+                                        </div>
+                                        <div class="card-footer border-primary text-primary">
+                                            Creditos: 3
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 4 -->
+                                    <div class="card course-card border-success text-success mb-3" data-cycle="tec" data-credits="2" id="tec-41">
+                                        <div class="card-header border-success">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: MÁQUINAS ELÉCTRICAS">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 19716
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">MÁQUINAS ELÉCTRICAS</h5>
+                                        </div>
+                                        <div class="card-footer border-success text-success">
+                                            Creditos: 2
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 5 -->
+                                    <div class="card course-card border-success text-success mb-3" data-cycle="tec" data-credits="3" id="tec-42">
+                                        <div class="card-header border-success">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: MÁQUINAS HIDRÁULICAS">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: 1824
+                                                </div>
+                                                <div class="col-auto">
+                                                    CP
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">MÁQUINAS HIDRÁULICAS</h5>
+                                        </div>
+                                        <div class="card-footer border-success text-success">
+                                            Creditos: 3
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 6 -->
+                                    <div class="card course-card border-light text-light mb-3" data-cycle="tec" data-credits="2" id="tec-43">
+                                        <div class="card-header border-light">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: ELECTIVA INTRISECA 3">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: -
+                                                </div>
+                                                <div class="col-auto">
+                                                    EI
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">ELECTIVA INTRISECA 3</h5>
+                                        </div>
+                                        <div class="card-footer border-light text-light">
+                                            Creditos: 2
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 7 -->
+                                    <div class="card course-card border-light text-light mb-3" data-cycle="tec" data-credits="2" id="tec-44">
+                                        <div class="card-header border-light">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" checked title="Marcar como aprobada" aria-label="Aprobada: ELECTIVA EXTRINSECA">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: -
+                                                </div>
+                                                <div class="col-auto">
+                                                    EE
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">ELECTIVA EXTRINSECA</h5>
+                                        </div>
+                                        <div class="card-footer border-light text-light">
+                                            Creditos: 2
+                                        </div>
+                                    </div>
+                                    <div class="card-footer border-secondary text-secondary">
+                                            <h5>Total de creditos: 17</h5>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            
+                    </div>
+                </div>
+            </div>
+            </div>
+            <div class="card text-center mt-4">
+                <div class="card-header">
+                    <h3>Ciclo de Ingeniería (54 Créditos)</h3>
+                </div>
+                <div class="card-body">
+                    <div class="container text-center">
+                        <div class="row align-items-start">
+                            <!-- Columna 1 -->
+                            <div class="col-12 col-md-6 col-lg-3">
+                                <div class="card text-center mt-1">
+                                    <div class="card-header">
+                                        <h4>Semestre 7</h4>
+                                    </div>
+                                    <!-- Tarjeta 1 -->
+                                    <div class="card course-card border-danger text-danger mb-3 mt-3" data-cycle="ing" data-credits="2" id="ing-1">
+                                        <div class="card-header border-danger">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" title="Marcar como aprobada" aria-label="Aprobada: PROBABILIDAD Y ESTADÍSTICA">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: -
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">PROBABILIDAD Y ESTADÍSTICA</h5>
+                                        </div>
+                                        <div class="card-footer border-danger text-danger">
+                                            Creditos: 2
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 2 -->
+                                    <div class="card course-card border-success text-success mb-3" data-cycle="ing" data-credits="3" id="ing-2">
+                                        <div class="card-header border-success">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" title="Marcar como aprobada" aria-label="Aprobada: TERMODINÁMICA APLICADA">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: -
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">TERMODINÁMICA APLICADA</h5>
+                                        </div>
+                                        <div class="card-footer border-success text-success">
+                                            Creditos: 3
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 3 -->
+                                    <div class="card course-card border-primary text-primary mb-3" data-cycle="ing" data-credits="3" id="ing-3">
+                                        <div class="card-header border-primary">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" title="Marcar como aprobada" aria-label="Aprobada: DISEÑO POR ELEMENTOS FINITOS">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: -
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">DISEÑO POR ELEMENTOS FINITOS</h5>
+                                        </div>
+                                        <div class="card-footer border-primary text-primary">
+                                            Creditos: 3
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 4 -->
+                                    <div class="card course-card border-warning text-warning mb-3" data-cycle="ing" data-credits="2" id="ing-4">
+                                        <div class="card-header border-warning">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" title="Marcar como aprobada" aria-label="Aprobada: ASEGURAMIENTO METROLÓGICO">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: -
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">ASEGURAMIENTO METROLÓGICO</h5>
+                                        </div>
+                                        <div class="card-footer border-warning text-warning">
+                                            Creditos: 2
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 5 -->
+                                    <div class="card course-card border-secondary text-secondary mb-3" data-cycle="ing" data-credits="1" id="ing-5">
+                                        <div class="card-header border-secondary">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" title="Marcar como aprobada" aria-label="Aprobada: CÁTEDRA DE CONTEXTO">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: -
+                                                </div>
+                                                <div class="col-auto">
+                                                    OC
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">CÁTEDRA DE CONTEXTO</h5>
+                                        </div>
+                                        <div class="card-footer border-secondary text-secondary">
+                                            Creditos: 1
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 6 -->
+                                    <div class="card course-card border-secondary text-secondary mb-3" data-cycle="ing" data-credits="2" id="ing-6">
+                                        <div class="card-header border-secondary">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" title="Marcar como aprobada" aria-label="Aprobada: PRODUCCIÓN DE TEXTOS CIENTÍFICOS">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: -
+                                                </div>
+                                                <div class="col-auto">
+                                                    OC
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">PRODUCCIÓN DE TEXTOS CIENTÍFICOS</h5>
+                                        </div>
+                                        <div class="card-footer border-secondary text-secondary">
+                                            Creditos: 2
+                                        </div>
+                                    </div>
+                                    <div class="card-footer border-secondary text-secondary">
+                                            <h5>Total de creditos: 13</h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Columna 2 -->
+                            <div class="col-12 col-md-6 col-lg-3">
+                                <div class="card text-center mt-1">
+                                    <div class="card-header">
+                                        <h4>Semestre 8</h4>
+                                    </div>
+                                    <!-- Tarjeta 7 -->
+                                    <div class="card course-card border-danger text-danger mb-3 mt-3" data-cycle="ing" data-credits="2" id="ing-7">
+                                        <div class="card-header border-danger">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" title="Marcar como aprobada" aria-label="Aprobada: DISEÑO EXPERIMENTAL">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: -
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">DISEÑO EXPERIMENTAL</h5>
+                                        </div>
+                                        <div class="card-footer border-danger text-danger">
+                                            Creditos: 2
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 8 -->
+                                    <div class="card course-card border-success text-success mb-3" data-cycle="ing" data-credits="3" id="ing-8">
+                                        <div class="card-header border-success">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" title="Marcar como aprobada" aria-label="Aprobada: TRANSFERENCIA DE CALOR">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: -
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">TRANSFERENCIA DE CALOR</h5>
+                                        </div>
+                                        <div class="card-footer border-success text-success">
+                                            Creditos: 3
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 9 -->
+                                    <div class="card course-card border-danger text-danger mb-3" data-cycle="ing" data-credits="3" id="ing-9">
+                                        <div class="card-header border-danger">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" title="Marcar como aprobada" aria-label="Aprobada: MANTENIMIENTO DE EQUIPOS INDUSTRIALES">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: -
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">MANTENIMIENTO DE EQUIPOS INDUSTRIALES</h5>
+                                        </div>
+                                        <div class="card-footer border-danger text-danger">
+                                            Creditos: 3
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 10 -->
+                                    <div class="card course-card border-primary text-primary mb-3" data-cycle="ing" data-credits="3" id="ing-10">
+                                        <div class="card-header border-primary">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" title="Marcar como aprobada" aria-label="Aprobada: DISEÑO DE MÁQUINAS">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: -
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">DISEÑO DE MÁQUINAS</h5>
+                                        </div>
+                                        <div class="card-footer border-primary text-primary">
+                                            Creditos: 3
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 11 -->
+                                    <div class="card course-card border-light text-light mb-3" data-cycle="ing" data-credits="2" id="ing-11">
+                                        <div class="card-header border-light">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" title="Marcar como aprobada" aria-label="Aprobada: ELECTIVA EXTRÍNSECA">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: -
+                                                </div>
+                                                <div class="col-auto">
+                                                    EE
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">ELECTIVA EXTRÍNSECA</h5>
+                                        </div>
+                                        <div class="card-footer border-light text-light">
+                                            Creditos: 2
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 12 -->
+                                    <div class="card course-card border-primary text-primary mb-3" data-cycle="ing" data-credits="3" id="ing-12">
+                                        <div class="card-header border-primary">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" title="Marcar como aprobada" aria-label="Aprobada: SISTEMAS DINÁMICOS Y CONTROL">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: -
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">SISTEMAS DINÁMICOS Y CONTROL</h5>
+                                        </div>
+                                        <div class="card-footer border-primary text-primary">
+                                            Creditos: 3
+                                        </div>
+                                    </div>
+                                    <div class="card-footer border-secondary text-secondary">
+                                            <h5>Total de creditos: 16</h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Columna 3 -->
+                            <div class="col-12 col-md-6 col-lg-3">
+                                <div class="card text-center mt-1">
+                                    <div class="card-header">
+                                        <h4>Semestre 9</h4>
+                                    </div>
+                                    <!-- Tarjeta 13 -->
+                                    <div class="card course-card border-light text-light mb-3 mt-3" data-cycle="ing" data-credits="2" id="ing-13">
+                                        <div class="card-header border-light">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" title="Marcar como aprobada" aria-label="Aprobada: TRABAJO DE GRADO I">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: -
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">TRABAJO DE GRADO I</h5>
+                                        </div>
+                                        <div class="card-footer border-light text-light">
+                                            Creditos: 2
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 14 -->
+                                    <div class="card course-card border-success text-success mb-3" data-cycle="ing" data-credits="3" id="ing-14">
+                                        <div class="card-header border-success">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" title="Marcar como aprobada" aria-label="Aprobada: MÁQUINAS TÉRMICAS">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: -
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">MÁQUINAS TÉRMICAS</h5>
+                                        </div>
+                                        <div class="card-footer border-success text-success">
+                                            Creditos: 3
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 15 -->
+                                    <div class="card course-card border-secondary text-secondary mb-3" data-cycle="ing" data-credits="3" id="ing-15">
+                                        <div class="card-header border-secondary">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" title="Marcar como aprobada" aria-label="Aprobada: INGENIERÍA ECONÓMICA">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: -
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">INGENIERÍA ECONÓMICA</h5>
+                                        </div>
+                                        <div class="card-footer border-secondary text-secondary">
+                                            Creditos: 3
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 16 -->
+                                    <div class="card course-card border-light text-light mb-3" data-cycle="ing" data-credits="2" id="ing-16">
+                                        <div class="card-header border-light">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" title="Marcar como aprobada" aria-label="Aprobada: ELECTIVA DE PROFUNDIZACIÓN I">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: -
+                                                </div>
+                                                <div class="col-auto">
+                                                    EI
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">ELECTIVA DE PROFUNDIZACIÓN I</h5>
+                                        </div>
+                                        <div class="card-footer border-light text-light">
+                                            Creditos: 2
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 17 -->
+                                    <div class="card course-card border-light text-light mb-3" data-cycle="ing" data-credits="2" id="ing-17">
+                                        <div class="card-header border-light">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" title="Marcar como aprobada" aria-label="Aprobada: ELECTIVA DE PROFUNDIZACIÓN III">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: -
+                                                </div>
+                                                <div class="col-auto">
+                                                    EI
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">ELECTIVA DE PROFUNDIZACIÓN III</h5>
+                                        </div>
+                                        <div class="card-footer border-light text-light">
+                                            Creditos: 2
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 18 -->
+                                    <div class="card course-card border-warning text-warning mb-3" data-cycle="ing" data-credits="3" id="ing-18">
+                                        <div class="card-header border-warning">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" title="Marcar como aprobada" aria-label="Aprobada: INGENIERÍA DE MANUFACTURA">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: -
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">INGENIERÍA DE MANUFACTURA</h5>
+                                        </div>
+                                        <div class="card-footer border-warning text-warning">
+                                            Creditos: 3
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 19 -->
+                                    <div class="card course-card border-light text-light mb-3" data-cycle="ing" data-credits="2" id="ing-19">
+                                        <div class="card-header border-light">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" title="Marcar como aprobada" aria-label="Aprobada: ELECTIVA DE PROFUNDIZACIÓN II">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: -
+                                                </div>
+                                                <div class="col-auto">
+                                                    EI
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">ELECTIVA DE PROFUNDIZACIÓN II</h5>
+                                        </div>
+                                        <div class="card-footer border-light text-light">
+                                            Creditos: 2
+                                        </div>
+                                    </div>
+                                    <div class="card-footer border-secondary text-secondary">
+                                            <h5>Total de creditos: 17</h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Columna 4 -->
+                            <div class="col-12 col-md-6 col-lg-3">
+                                <div class="card text-center mt-1">
+                                    <div class="card-header">
+                                        <h4>Semestre 10</h4>
+                                    </div>
+                                    <!-- Tarjeta 20 -->
+                                    <div class="card course-card border-light text-light mb-3 mt-3" data-cycle="ing" data-credits="2" id="ing-20">
+                                        <div class="card-header border-light">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" title="Marcar como aprobada" aria-label="Aprobada: TRABAJO DE GRADO II">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: -
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">TRABAJO DE GRADO II</h5>
+                                        </div>
+                                        <div class="card-footer border-light text-light">
+                                            Creditos: 2
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 21 -->
+                                    <div class="card course-card border-light text-light mb-3" data-cycle="ing" data-credits="3" id="ing-21">
+                                        <div class="card-header border-light">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" title="Marcar como aprobada" aria-label="Aprobada: ELECTIVA DE PROFUNDIZACIÓN V">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: -
+                                                </div>
+                                                <div class="col-auto">
+                                                    EI
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">ELECTIVA DE PROFUNDIZACIÓN V</h5>
+                                        </div>
+                                        <div class="card-footer border-light text-light">
+                                            Creditos: 3
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 22 -->
+                                    <div class="card course-card border-secondary text-secondary mb-3" data-cycle="ing" data-credits="3" id="ing-22">
+                                        <div class="card-header border-secondary">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" title="Marcar como aprobada" aria-label="Aprobada: FORMULACIÓN Y EVALUACIÓN DE PROYECTOS">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: -
+                                                </div>
+                                                <div class="col-auto">
+                                                    OB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">FORMULACIÓN Y EVALUACIÓN DE PROYECTOS</h5>
+                                        </div>
+                                        <div class="card-footer border-secondary text-secondary">
+                                            Creditos: 3
+                                        </div>
+                                    </div>
+                                    <!-- Tarjeta 23 -->
+                                    <div class="card course-card border-light text-light mb-3" data-cycle="ing" data-credits="2" id="ing-23">
+                                        <div class="card-header border-light">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto form-check form-check-inline mb-0">
+                                                    <input class="form-check-input course-check" type="checkbox" title="Marcar como aprobada" aria-label="Aprobada: ELECTIVA DE PROFUNDIZACIÓN IV">
+                                                </div>
+                                                <div class="col text-start ps-0">
+                                                    Cod: -
+                                                </div>
+                                                <div class="col-auto">
+                                                    EI
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">ELECTIVA DE PROFUNDIZACIÓN IV</h5>
+                                        </div>
+                                        <div class="card-footer border-light text-light">
+                                            Creditos: 2
+                                        </div>
+                                    </div>
+                                    <div class="card-footer border-secondary text-secondary">
+                                            <h5>Total de creditos: 10</h5>
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -38,5 +1697,6 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="./services/js/planEstudios.js"></script>
 </body>
 </html>

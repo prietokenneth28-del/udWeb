@@ -1,72 +1,70 @@
-/* Estilos para la tarjeta personalizada */
-.custom-card {
-    border: 2px solid black !important;
-    border-radius: 0 !important; /* Esquinas cuadradas */
-    background-color: #fcd5b5; /* Color melocotón de fondo */
-    box-shadow: none;
+/* Plan de estudios — estilos */
+
+body {
+    padding-bottom: 2rem;
 }
 
-/* El encabezado dividido en dos columnas */
-.custom-card .card-header {
-    padding: 0;
-    background-color: transparent;
-    border-bottom: 2px solid black;
-    border-radius: 0;
-    display: flex;
+/* --- Tarjetas de curso --- */
+.course-card {
+    transition: opacity 0.2s ease, transform 0.15s ease;
 }
 
-/* Sección izquierda del encabezado */
-.custom-card .header-left {
-    flex: 1;
-    border-right: 2px solid black;
-    background-color: #fcd5b5;
-    display: flex;
+.course-card:hover {
+    transform: translateY(-2px);
+}
+
+.course-card .card-title {
+    font-size: 0.95rem;
+    min-height: 2.4em;
+}
+
+.course-check {
+    cursor: pointer;
+}
+
+/* Curso aún no aprobado: se atenúa para distinguirlo de un vistazo */
+.course-card.is-pending {
+    opacity: 0.45;
+}
+
+.course-card.is-pending .card-title {
+    text-decoration: line-through;
+}
+
+/* --- Leyenda --- */
+.legend-item {
+    display: inline-flex;
     align-items: center;
-    justify-content: center;
-    padding: 5px;
+    gap: 0.4rem;
+    white-space: nowrap;
 }
 
-/* Sección derecha del encabezado (el número) */
-.custom-card .header-right {
-    flex: 1;
-    background-color: #c95c10; /* Naranja oscuro */
-    color: black;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-family: serif;
-    font-size: 1.2rem;
+.legend-swatch {
+    display: inline-block;
+    width: 0.9rem;
+    height: 0.9rem;
+    border-radius: 0.2rem;
+    border-width: 3px !important;
+    border-style: solid;
 }
 
-/* El cuerpo de la tarjeta */
-.custom-card .card-body {
-    padding: 1.5rem 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+/* --- Dashboard --- */
+#dashboard .card {
+    border-width: 0;
+    background-color: var(--bs-tertiary-bg);
 }
 
-/* El texto de la materia */
-.custom-card .card-title {
-    margin: 0;
-    color: #002d62; /* Azul marino */
-    font-family: "Times New Roman", Times, serif;
-    font-weight: bold;
-    font-size: 1.1rem;
-    text-transform: uppercase;
-    text-shadow: 0px 0px 1px rgba(0,0,0,0.3); /* Un ligero sombreado para darle grosor */
+#stat-progress-bar {
+    transition: width 0.3s ease;
 }
 
-/* Estilo para simular el check de la imagen */
-.custom-checkbox {
-    background-color: black;
-    color: #ff9900; /* Naranja del check */
-    width: 24px;
-    height: 24px;
-    border-radius: 3px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #000;
+/* --- Exportación a PDF: quitamos sombras/hover y aseguramos fondo claro legible --- */
+@media print {
+    #btn-pdf {
+        display: none;
+    }
+}
+
+.pdf-export-mode .course-card:hover {
+    transform: none;
 }
