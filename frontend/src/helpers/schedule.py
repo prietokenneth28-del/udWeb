@@ -65,25 +65,23 @@ for hora in range(6, 22):
     
     for dia in range(6):
         celda = horario[dia][hora]
+        js_dia = dia + 1 # En JS, 1 es Lunes, 6 es Sábado
         
         if celda is None:
-            # Espacio vacío
             html_output += "\n                                    <td></td>"
         elif celda['es_inicio']:
-            # Inicio de un bloque de 2 horas (usamos rowspan="2")
+            # AQUI ESTÁ LA MAGIA: Agregamos data-dia, data-hora, data-materia y data-color
             html_output += f"""
-                                    <td rowspan="2" class="align-middle">
+                                    <td rowspan="2" class="align-middle" data-dia="{js_dia}" data-hora="{hora}:00 - {hora+2}:00" data-materia="{celda['nombre']}" data-color="{celda['color']}">
                                         <div class="materia-slot {celda['color']} text-white">
                                             {celda['nombre']}<br><small>Aula Por Definir</small>
                                         </div>
                                     </td>"""
-        # Si es_inicio es False, es la segunda hora del bloque. 
-        # No agregamos <td> porque el rowspan="2" de la fila anterior ya ocupa este espacio.
 
     html_output += "\n                                </tr>"
-
 # Guardar en archivo
 with open("filas_horario.html", "w", encoding="utf-8") as f:
     f.write(html_output)
 
 print("¡Listo! Copia el contenido de 'filas_horario.html' y pégalo dentro de tu <tbody>")
+
