@@ -32,10 +32,7 @@
                     
                     <!-- SELECT PARA ELEGIR EL SEMESTRE -->
                     <select id="semestreSelect" class="form-select w-auto" aria-label="Seleccionar Semestre">
-                        <!-- Añade más opciones a medida que necesites -->
-                        <option value="7" selected>Semestre 7 (2026-2)</option>
-                        <option value="8">Semestre 8</option>
-                        <option value="9">Semestre 9</option>
+                        <!-- Las opciones se generan dinámicamente desde schedule-data.js -->
                     </select>
                 </div>
                 
@@ -70,201 +67,8 @@
                                     <th scope="col" style="width: 15%;">Sábado</th>
                                 </tr>
                             </thead>
-                            
-                            <!-- TBODY SEMESTRE 7 (Activo por defecto) -->
-                            <!-- Nota el id "horario-semestre-7" -->
-                            <tbody id="horario-semestre-7" class="horario-tbody active">
-
-                                <tr>
-
-                                <tr>
-                                    <th scope="row">6:00 - 7:00</th>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">7:00 - 8:00</th>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">8:00 - 9:00</th>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">9:00 - 10:00</th>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">10:00 - 11:00</th>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td rowspan="2" class="align-middle" data-dia="6" data-hora="10:00 - 12:00" data-materia="DISEÑO POR ELEMENTOS FINITOS" data-color="bg-primary">
-                                        <div class="materia-slot bg-primary text-white">
-                                            DISEÑO POR ELEMENTOS FINITOS<br><small>Aula Por Definir</small>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">11:00 - 12:00</th>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">12:00 - 13:00</th>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td rowspan="2" class="align-middle" data-dia="6" data-hora="12:00 - 14:00" data-materia="DISEÑO POR ELEMENTOS FINITOS" data-color="bg-primary">
-                                        <div class="materia-slot bg-primary text-white">
-                                            DISEÑO POR ELEMENTOS FINITOS<br><small>Aula Por Definir</small>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">13:00 - 14:00</th>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">14:00 - 15:00</th>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td rowspan="2" class="align-middle" data-dia="6" data-hora="14:00 - 16:00" data-materia="CÁTEDRA DE CONTEXTO" data-color="bg-secondary">
-                                        <div class="materia-slot bg-secondary text-white">
-                                            CÁTEDRA DE CONTEXTO<br><small>Aula Por Definir</small>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">15:00 - 16:00</th>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">16:00 - 17:00</th>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td rowspan="2" class="align-middle" data-dia="6" data-hora="16:00 - 18:00" data-materia="CÁTEDRA DE CONTEXTO" data-color="bg-secondary">
-                                        <div class="materia-slot bg-secondary text-white">
-                                            CÁTEDRA DE CONTEXTO<br><small>Aula Por Definir</small>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">17:00 - 18:00</th>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">18:00 - 19:00</th>
-                                    <td rowspan="2" class="align-middle" data-dia="1" data-hora="18:00 - 20:00" data-materia="TERMODINÁMICA APLICADA" data-color="bg-success">
-                                        <div class="materia-slot bg-success text-white">
-                                            TERMODINÁMICA APLICADA<br><small>Aula Por Definir</small>
-                                        </div>
-                                    </td>
-                                    <td rowspan="2" class="align-middle" data-dia="2" data-hora="18:00 - 20:00" data-materia="PRODUCCIÓN DE TEXTOS CIENTÍFICOS" data-color="bg-secondary">
-                                        <div class="materia-slot bg-secondary text-white">
-                                            PRODUCCIÓN DE TEXTOS CIENTÍFICOS<br><small>Aula Por Definir</small>
-                                        </div>
-                                    </td>
-                                    <td rowspan="2" class="align-middle" data-dia="3" data-hora="18:00 - 20:00" data-materia="TERMODINÁMICA APLICADA" data-color="bg-success">
-                                        <div class="materia-slot bg-success text-white">
-                                            TERMODINÁMICA APLICADA<br><small>Aula Por Definir</small>
-                                        </div>
-                                    </td>
-                                    <td rowspan="2" class="align-middle" data-dia="4" data-hora="18:00 - 20:00" data-materia="ASEGURAMIENTO METROLÓGICO" data-color="bg-warning">
-                                        <div class="materia-slot bg-warning text-white">
-                                            ASEGURAMIENTO METROLÓGICO<br><small>Aula Por Definir</small>
-                                        </div>
-                                    </td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">19:00 - 20:00</th>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">20:00 - 21:00</th>
-                                    <td rowspan="2" class="align-middle" data-dia="1" data-hora="20:00 - 22:00" data-materia="PRODUCCIÓN DE TEXTOS CIENTÍFICOS" data-color="bg-secondary">
-                                        <div class="materia-slot bg-secondary text-white">
-                                            PRODUCCIÓN DE TEXTOS CIENTÍFICOS<br><small>Aula Por Definir</small>
-                                        </div>
-                                    </td>
-                                    <td rowspan="2" class="align-middle" data-dia="2" data-hora="20:00 - 22:00" data-materia="PROBABILIDAD Y ESTADÍSTICA" data-color="bg-danger">
-                                        <div class="materia-slot bg-danger text-white">
-                                            PROBABILIDAD Y ESTADÍSTICA<br><small>Aula Por Definir</small>
-                                        </div>
-                                    </td>
-                                    <td rowspan="2" class="align-middle" data-dia="3" data-hora="20:00 - 22:00" data-materia="ASEGURAMIENTO METROLÓGICO" data-color="bg-warning">
-                                        <div class="materia-slot bg-warning text-white">
-                                            ASEGURAMIENTO METROLÓGICO<br><small>Aula Por Definir</small>
-                                        </div>
-                                    </td>
-                                    <td></td>
-                                    <td rowspan="2" class="align-middle" data-dia="5" data-hora="20:00 - 22:00" data-materia="PROBABILIDAD Y ESTADÍSTICA" data-color="bg-danger">
-                                        <div class="materia-slot bg-danger text-white">
-                                            PROBABILIDAD Y ESTADÍSTICA<br><small>Aula Por Definir</small>
-                                        </div>
-                                    </td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">21:00 - 22:00</th>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
-                            </tbody>
-
-                            <!-- TBODY SEMESTRE 8 (Ejemplo vacío) -->
-                            <!-- Nota el id "horario-semestre-8" -->
-                            <tbody id="horario-semestre-8" class="horario-tbody">
-                                <!-- AQUÍ PEGARÍAS EL CÓDIGO PARA EL SEMESTRE 8 -->
-                            </tbody>
-
+                            <!-- Los <tbody> de cada semestre se generan dinámicamente
+                                 desde schedule-data.js por main.shedule.js -->
                         </table>
                     </div>
 
@@ -275,6 +79,46 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
+    <script src="../services/js/schedule-data.js"></script>
     <script src="../services/js/main.shedule.js"></script>
+
+        <footer class="border-top mt-5 pt-4 pb-3">
+    <div class="container-fluid">
+        <div class="row gy-3 align-items-center">
+            <div class="col-12 col-md-5">
+                <h6 class="mb-1">Horario de Clases · Ingeniería Mecánica</h6>
+                <p class="text-body-secondary small mb-0">
+                    Kenneth Prieto &middot; herramienta personal para seguir el avance de la carrera.
+                </p>
+            </div>
+
+            <div class="col-6 col-md-4">
+                <ul class="list-unstyled small mb-0">
+                    <li><a href="../index.html" class="link-secondary link-underline-opacity-0">Plan de estudios</a></li>
+                    <li><a href="#" class="link-secondary link-underline-opacity-0">Ciclo Tecnológico</a></li>
+                    <li><a href="#" class="link-secondary link-underline-opacity-0">Ciclo de Ingeniería</a></li>
+                </ul>
+            </div>
+
+            <div class="col-6 col-md-3 text-md-end">
+                <a href="https://github.com/prietokenneth28-del" class="text-body-secondary fs-5 me-3" title="GitHub">
+                    <i class="bi bi-github"></i>
+                </a>
+                <a href="#" class="text-body-secondary fs-5 me-3" title="LinkedIn">
+                    <i class="bi bi-linkedin"></i>
+                </a>
+                <a href="mailto:tu-correo@ejemplo.com" class="text-body-secondary fs-5" title="Correo">
+                    <i class="bi bi-envelope"></i>
+                </a>
+            </div>
+        </div>
+
+        <hr class="my-3">
+
+        <p class="text-body-secondary small text-center mb-0">
+            &copy; <span id="footer-year"></span> &middot; Hecho con HTML, Bootstrap y un poco de café.
+        </p>
+    </div>
+</footer>
 </body>
 </html>

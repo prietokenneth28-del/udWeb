@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="dark">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Histórico de Notas - Kenneth Prieto</title>
+    
+    <!-- Hojas de estilo -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="../services/css/planEstudios.css">
+    
+    <style>
+        /* Estilos específicos para acercarnos a la imagen referenciada */
+        .title-banner {
+            background-color: #17a2b8; /* Color cyan/teal similar al de la imagen */
+            color: white;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .nivel-header {
+            background-color: #212529 !important; 
+            font-weight: bold; 
+            font-size: 1.1em;
+            border-bottom: 2px solid #17a2b8;
+        }
+        .table-notas th {
+            background-color: #2b3035;
+            vertical-align: middle;
+            font-size: 0.9em;
+        }
+        .table-notas td {
+            vertical-align: middle;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid mt-4">
+        <!-- Encabezado con botón de retorno -->
+        <header class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+            <a href="../index.html" class="btn btn-outline-light">
+                <i class="bi bi-arrow-left"></i> Volver al Plan de Estudios
+            </a>
+        </header>
+
+        <main>
+            <div class="card text-center mb-4">
+                <div class="card-header title-banner py-2">
+                    <h4 class="mb-0">Histórico de Notas</h4>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-notas text-center mb-0" id="gradesTable">
+                            <tbody id="notas-tbody">
+                                <!-- El contenido se generará dinámicamente con JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-top mt-5 pt-4 pb-3">
+        <div class="container-fluid">
+            <p class="text-body-secondary small text-center mb-0">
+                &copy; <span id="footer-year"></span> &middot; Hecho con HTML, Bootstrap y un poco de café
+            </p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../services/js/courses-data.js"></script>
+    
+    <!-- Lógica de Generación de la Tabla -->
+    <script>
+        document.getElementById("footer-year").textContent = new Date().getFullYear();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const tableBody = document.getElementById('notas-tbody');
+            
+            // Verificamos que los datos se hayan cargado correctamente
+            if (typeof COURSES === "undefined") {
+                tableBody.innerHTML = '<tr><td colspan="8" class="text-danger">Error: No se pudo cargar courses-data.js</td></tr>';
+                return;
+            }
+
+            // 1. Agrupar los cursos por nivel (semestre)
+            const niveles = {};
+            COURSES.forEach(course => {
+                if (!niveles[course.semester]) {
+                    niveles[course.semester] = [];
+                }
+                niveles[course.semester].push(course);
+            });
+
+            // 2. Ordenar los niveles y generar el HTML
+            const nivelesOrdenados = Object.keys(niveles).sort((a, b) => Number(a) - Number(b));
+            
+            nivelesOrdenados.forEach(nivel => {
+                // Generar el encabezado del Nivel
+                tableBody.innerHTML += `
+                    <tr>
+                        <td colspan="8" class="nivel-header text-center py-2">NIVEL: ${nivel}</td>
+                    </tr>
+                    <tr class="table-secondary">
+                        <th style="width: 10%;">Asignatura</th>
+                        <th class="text-start" style="width: 30%;">Nombre</th>
+                        <th style="width: 10%;">Nota</th>
+                        <th style="width: 10%;">Créditos</th>
+                        <th style="width: 10%;">Clasificación</th>
+                        <th style="width: 10%;">Año</th>
+                        <th style="width: 10%;">Periodo</th>
+                        <th style="width: 10%;">Observación</th>
+                    </tr>
+                `;
+
+                // Generar las filas de cada materia en este nivel
+                niveles[nivel].forEach(course => {
+                    // CONDICIONAL PARA LA NOTA: Verifica si la propiedad 'note' existe
+                    const notaMostrar = course.hasOwnProperty('note') ? course.note : '<span class="text-muted">-</span>';
+                    
+                    // Condicionales adicionales por si decides agregar estas propiedades en el futuro
+                    const anioMostrar = course.hasOwnProperty('year') ? course.year : '-';
+                    const periodoMostrar = course.hasOwnProperty('period') ? course.period : '-';
+                    const obsMostrar = course.hasOwnProperty('observation') ? course.observation : '';
+                    
+                    // Manejo visual de códigos vacíos
+                    const codigo = (course.code && course.code !== "-") ? course.code : "";
+
+                    tableBody.innerHTML += `
+                        <tr>
+                            <td>${codigo}</td>
+                            <td class="text-start fw-bold">${course.name}</td>
+                            <td class="text-info fw-bold">${notaMostrar}</td>
+                            <td>${course.credits}</td>
+                            <td>${course.type}</td>
+                            <td>${anioMostrar}</td>
+                            <td>${periodoMostrar}</td>
+                            <td class="text-start small">${obsMostrar}</td>
+                        </tr>
+                    `;
+                });
+            });
+        });
+    </script>
+</body>
+</html>

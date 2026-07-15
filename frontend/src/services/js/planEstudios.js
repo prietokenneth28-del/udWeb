@@ -57,6 +57,93 @@
         return !!course.approved;
     }
 
+    // --- Prerrequisitos --------------------------------------------------
+    // Se leen del campo "prereq" (arreglo de ids) de cada curso en
+    // courses-data.js. Para agregar uno: prereq: ["tec-1", "tec-9"]
+
+    let courseById = null;
+
+    function getCourseById(id) {
+        if (!courseById) {
+            courseById = new Map(COURSES.map((c) => [c.id, c]));
+        }
+        return courseById.get(id);
+    }
+
+    // true = todos cumplidos, false = falta alguno, null = no tiene prerrequisitos
+    function prereqsCumplidos(course) {
+        if (!course.prereq || course.prereq.length === 0) return null;
+        return course.prereq.every((id) => {
+            const card = document.getElementById(id);
+            const checkbox = card ? card.querySelector(".course-check") : null;
+            return checkbox ? checkbox.checked : false;
+        });
+    }
+
+    function buildPrereqPopoverContent(course) {
+        // Se evalúa cada vez que se abre el popover, así el check ✔/✘
+        // siempre refleja el estado actual de las casillas.
+        return function () {
+            if (!course.prereq || course.prereq.length === 0) {
+                return '<p class="mb-0 text-body-secondary small">Sin prerrequisitos.</p>';
+            }
+            const items = course.prereq
+                .map((prereqId) => {
+                    const prereqCourse = getCourseById(prereqId);
+                    if (!prereqCourse) {
+                        return `<li class="text-warning">${prereqId} (no encontrado en courses-data.js)</li>`;
+                    }
+                    const prereqCard = document.getElementById(prereqCourse.id);
+                    const checkbox = prereqCard ? prereqCard.querySelector(".course-check") : null;
+                    const cumplido = checkbox ? checkbox.checked : false;
+                    const icon = cumplido
+                        ? '<i class="bi bi-check-circle-fill text-success"></i>'
+                        : '<i class="bi bi-x-circle text-danger"></i>';
+                    return `<li>${icon} ${prereqCourse.name}</li>`;
+                })
+                .join("");
+            return `<ul class="list-unstyled mb-0 text-start small">${items}</ul>`;
+        };
+    }
+
+    function initPrereqPopovers() {
+        document.querySelectorAll(".prereq-btn").forEach((btn) => {
+            const existing = bootstrap.Popover.getInstance(btn);
+            if (existing) existing.dispose();
+
+            const course = getCourseById(btn.dataset.courseId);
+            if (!course) return;
+
+            new bootstrap.Popover(btn, {
+                trigger: "focus",
+                html: true,
+                container: "body",
+                placement: "auto",
+                title: `Prerrequisitos — ${course.name}`,
+                content: buildPrereqPopoverContent(course),
+            });
+        });
+    }
+
+    function updatePrereqIndicators() {
+        document.querySelectorAll(".prereq-btn").forEach((btn) => {
+            const course = getCourseById(btn.dataset.courseId);
+            if (!course) return;
+            const icon = btn.querySelector("i");
+            if (!icon) return;
+
+            const estado = prereqsCumplidos(course);
+            icon.classList.remove("text-success", "text-danger", "text-body-secondary");
+            if (estado === null) {
+                icon.classList.add("text-body-secondary");
+            } else if (estado) {
+                icon.classList.add("text-success");
+            } else {
+                icon.classList.add("text-danger");
+            }
+        });
+    }
+
     // --- Construcción de tarjetas --------------------------------------
 
     function buildCourseCard(course, savedState) {
@@ -72,6 +159,15 @@
 
         const codeLabel = course.code && course.code !== "-" ? course.code : "-";
 
+        const prereqBtn = `
+            <button type="button" class="btn btn-sm btn-link p-0 lh-1 prereq-btn"
+                data-course-id="${course.id}"
+                data-bs-toggle="popover"
+                aria-label="Ver prerrequisitos de ${course.name}">
+                <i class="bi bi-info-circle"></i>
+            </button>
+        `;
+
         card.innerHTML = `
             <div class="card-header border-${color}">
                 <div class="row align-items-center">
@@ -82,7 +178,10 @@
                             aria-label="Aprobada: ${course.name}">
                     </div>
                     <div class="col text-start ps-0">Cod: ${codeLabel}</div>
-                    <div class="col-auto">${course.type || ""}</div>
+                    <div class="col-auto d-flex align-items-center gap-1">
+                        <span>${course.type || ""}</span>
+                        ${prereqBtn}
+                    </div>
                 </div>
             </div>
             <div class="card-body">
@@ -209,6 +308,8 @@
             bar.style.width = percent + "%";
             bar.parentElement.setAttribute("aria-valuenow", String(percent));
         }
+
+        updatePrereqIndicators();
     }
 
     function setText(id, value) {
@@ -269,6 +370,7 @@
         renderPlan();
         attachCheckboxListeners();
         attachPdfButton();
+        initPrereqPopovers();
         updateDashboard();
     });
 })();

@@ -123,7 +123,7 @@ const COURSES = [
         "category": "fisica-matematica",
         "type": "OB",
         "approved": true,
-        "prereq": []
+        "prereq": ["tec-1"]
     },
     {
         "id": "tec-11",
