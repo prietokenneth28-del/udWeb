@@ -78,6 +78,11 @@ def update_historial(
     return registro
 
 
+def delete_historial(db: Session, registro: models.HistorialAcademico) -> None:
+    db.delete(registro)
+    db.commit()
+
+
 # --- Estadísticas / PAPA ---------------------------------------------------
 
 def get_estadisticas(db: Session) -> schemas.EstadisticasOut:

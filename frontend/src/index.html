@@ -24,9 +24,12 @@
                 </button> -->
             </header>
 
+            <!-- Aviso de error de conexión con el backend -->
+            <div class="alert alert-danger d-none" id="api-error-banner" role="alert"></div>
+
             <!-- Panel de progreso -->
             <div class="row g-3 mb-3" id="dashboard">
-                <div class="col-6 col-lg-3">
+                <div class="col-6 col-lg">
                     <div class="card text-center h-100">
                         <div class="card-body">
                             <h6 class="card-subtitle text-body-secondary mb-1">Créditos totales</h6>
@@ -35,7 +38,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-6 col-lg-3">
+                <div class="col-6 col-lg">
                     <div class="card text-center h-100">
                         <div class="card-body">
                             <h6 class="card-subtitle text-body-secondary mb-1">Créditos aprobados</h6>
@@ -44,7 +47,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-6 col-lg-3">
+                <div class="col-6 col-lg">
                     <div class="card text-center h-100">
                         <div class="card-body">
                             <h6 class="card-subtitle text-body-secondary mb-1">% avance</h6>
@@ -55,11 +58,19 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-6 col-lg-3">
+                <div class="col-6 col-lg">
                     <div class="card text-center h-100">
                         <div class="card-body">
                             <h6 class="card-subtitle text-body-secondary mb-1">Por cursar</h6>
                             <p class="fs-4 mb-0" id="stat-remaining">160</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg">
+                    <div class="card text-center h-100">
+                        <div class="card-body">
+                            <h6 class="card-subtitle text-body-secondary mb-1">PAPA</h6>
+                            <p class="fs-4 mb-0" id="stat-papa">&mdash;</p>
                         </div>
                     </div>
                 </div>
@@ -109,10 +120,38 @@
         </main>
     </div>
 
+    <!-- Modal: registrar/editar nota de una materia -->
+    <div class="modal fade" id="notaModal" tabindex="-1" aria-labelledby="notaModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="notaModalLabel">Registrar nota</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-3" id="notaModalCourseName"></p>
+                    <div class="alert alert-danger d-none" id="notaModalError"></div>
+                    <div class="mb-3">
+                        <label for="notaInput" class="form-label">Nota final (0.0 &ndash; 5.0)</label>
+                        <input type="number" class="form-control" id="notaInput" min="0" max="5" step="0.1" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="periodoInput" class="form-label">Periodo</label>
+                        <input type="text" class="form-control" id="periodoInput" placeholder="2026-2" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="notaModalSave">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script src="./services/js/courses-data.js"></script>
+    <script src="./services/js/api.js"></script>
     <script src="./services/js/planEstudios.js"></script>
 
     <footer class="border-top mt-5 pt-4 pb-3">

@@ -3,10 +3,11 @@ API REST del plan de estudios.
 
 Endpoints (tal como se describen en el documento de arquitectura):
     GET  /api/plan-estudios     -> malla curricular completa (ciclos > semestres > materias)
-    GET  /api/historial         -> materias cursadas y sus notas
-    POST /api/historial         -> registra una nueva nota
-    PUT  /api/historial/{id}    -> actualiza una nota existente
-    GET  /api/estadisticas      -> créditos aprobados y PAPA
+    GET    /api/historial         -> materias cursadas y sus notas
+    POST   /api/historial         -> registra una nueva nota
+    PUT    /api/historial/{id}    -> actualiza una nota existente
+    DELETE /api/historial/{id}    -> elimina un registro de historial
+    GET    /api/estadisticas      -> créditos aprobados y PAPA
 
 Ejecutar en desarrollo:
     uvicorn app.main:app --reload
@@ -63,6 +64,15 @@ def update_historial(
     if registro is None:
         raise HTTPException(status_code=404, detail="Registro de historial no encontrado")
     return crud.update_historial(db, registro, data)
+
+
+@app.delete("/api/historial/{historial_id}", status_code=204)
+def delete_historial(historial_id: int, db: Session = Depends(get_db)):
+    """Elimina un registro de historial (p. ej. para deshacer una nota mal cargada)."""
+    registro = crud.get_historial_by_id(db, historial_id)
+    if registro is None:
+        raise HTTPException(status_code=404, detail="Registro de historial no encontrado")
+    crud.delete_historial(db, registro)
 
 
 @app.get("/api/estadisticas", response_model=schemas.EstadisticasOut)
