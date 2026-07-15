@@ -1,18 +1,18 @@
 // Plan de estudios — interactividad
 //
-// Las tarjetas de curso se generan a partir del plan de estudios y el
-// historial de notas que expone el backend (ver /backend):
-//   GET  /api/plan-estudios  -> ciclos > semestres > materias
-//   GET  /api/historial      -> notas registradas por materia
-//   GET  /api/estadisticas   -> créditos, % de avance y PAPA
+// Las tarjetas de curso YA NO están escritas a mano en el HTML: se generan
+// aquí a partir del arreglo COURSES definido en courses-data.js. Para
+// agregar, quitar o editar un curso, modifica ese archivo — no este.
 //
-// Marcar una materia como aprobada abre un formulario para capturar la
-// nota real y el periodo (POST/PUT /api/historial). Desmarcarla borra
-// ese registro de historial (DELETE /api/historial/{id}) — no hay
-// almacenamiento local: todo vive en la base de datos del backend.
+// Estado de aprobación: se guarda en localStorage (clave "planEstudios:v1"),
+// así que el avance se recuerda entre visitas. El valor "approved" de cada
+// curso en courses-data.js solo se usa la primera vez que abres la página
+// en ese navegador (o si borras el almacenamiento local).
 
 (function () {
     "use strict";
+
+    const STORAGE_KEY = "planEstudios:v1";
 
     const CATEGORY_TO_COLOR = {
         "fisica-matematica": "danger",
@@ -23,87 +23,54 @@
         "electivas-grado": "light",
     };
 
-    // Categoría por defecto para materias que el backend no clasificó
-    // (columna opcional `categoria` en Materias).
-    const DEFAULT_CATEGORY = "electivas-grado";
+    const CYCLE_LABELS = {
+        tec: "Ciclo Tecnológico",
+        ing: "Ciclo de Ingeniería",
+    };
 
-    // Estado en memoria, reconstruido en cada carga desde el backend.
-    let historialByMateriaId = new Map();
-    let pendingCourse = null; // curso que se está editando en el modal
+    // --- Persistencia -------------------------------------------------
 
-    // --- Utilidades ------------------------------------------------------
-
-    function cicloToCycleKey(nombreCiclo) {
-        const n = nombreCiclo.toLowerCase();
-        if (n.includes("tecnol")) return "tec";
-        if (n.includes("ingenier")) return "ing";
-        return "otro";
+    function loadApprovedState() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            return raw ? JSON.parse(raw) : {};
+        } catch (err) {
+            console.warn("No se pudo leer el estado guardado:", err);
+            return {};
+        }
     }
 
-    function cycleLabel(nombreCiclo, totalCredits) {
-        return `${nombreCiclo} (${totalCredits} Créditos)`;
+    function saveApprovedState(state) {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch (err) {
+            console.warn("No se pudo guardar el estado:", err);
+        }
     }
 
-    function currentPeriodo() {
-        const now = new Date();
-        const half = now.getMonth() + 1 <= 6 ? 1 : 2;
-        return `${now.getFullYear()}-${half}`;
+    function isApproved(course, savedState) {
+        // El estado guardado en el navegador tiene prioridad sobre el
+        // valor por defecto que trae courses-data.js.
+        if (Object.prototype.hasOwnProperty.call(savedState, course.id)) {
+            return !!savedState[course.id];
+        }
+        return !!course.approved;
     }
 
-    function setText(id, value) {
-        const el = document.getElementById(id);
-        if (el) el.textContent = value;
-    }
+    // --- Construcción de tarjetas --------------------------------------
 
-    function showApiError(message) {
-        const banner = document.getElementById("api-error-banner");
-        if (!banner) return;
-        banner.textContent = message;
-        banner.classList.remove("d-none");
-    }
-
-    function clearApiError() {
-        const banner = document.getElementById("api-error-banner");
-        if (banner) banner.classList.add("d-none");
-    }
-
-    // --- Carga de datos ----------------------------------------------------
-
-    async function loadPlan() {
-        const [ciclos, historial] = await Promise.all([
-            Api.getPlanEstudios(),
-            Api.getHistorial(),
-        ]);
-
-        historialByMateriaId = new Map();
-        historial.forEach((registro) => {
-            // El backend ya ordena por fecha_registro desc, así que el
-            // primer registro que veamos por materia es el más reciente.
-            if (!historialByMateriaId.has(registro.materia_id)) {
-                historialByMateriaId.set(registro.materia_id, registro);
-            }
-        });
-
-        return ciclos;
-    }
-
-    // --- Construcción de tarjetas -----------------------------------------
-
-    function buildCourseCard(materia, cycleKey) {
-        const category = materia.categoria || DEFAULT_CATEGORY;
-        const color = CATEGORY_TO_COLOR[category] || "light";
-        const registro = historialByMateriaId.get(materia.id);
-        const approved = !!registro && registro.estado === "Aprobada";
+    function buildCourseCard(course, savedState) {
+        const color = CATEGORY_TO_COLOR[course.category] || "light";
+        const approved = isApproved(course, savedState);
 
         const card = document.createElement("div");
         card.className = `card course-card border-${color} text-${color} mb-3`;
-        card.dataset.cycle = cycleKey;
-        card.dataset.credits = materia.creditos;
-        card.dataset.category = category;
-        card.dataset.materiaId = String(materia.id);
-        card.id = `materia-${materia.id}`;
+        card.dataset.cycle = course.cycle;
+        card.dataset.credits = course.credits;
+        card.dataset.category = course.category;
+        card.id = course.id;
 
-        const codeLabel = materia.codigo && materia.codigo !== "-" ? materia.codigo : "-";
+        const codeLabel = course.code && course.code !== "-" ? course.code : "-";
 
         card.innerHTML = `
             <div class="card-header border-${color}">
@@ -112,31 +79,24 @@
                         <input class="form-check-input course-check" type="checkbox"
                             ${approved ? "checked" : ""}
                             title="Marcar como aprobada"
-                            aria-label="Aprobada: ${materia.nombre}">
+                            aria-label="Aprobada: ${course.name}">
                     </div>
                     <div class="col text-start ps-0">Cod: ${codeLabel}</div>
-                    <div class="col-auto">${materia.tipo || ""}</div>
+                    <div class="col-auto">${course.type || ""}</div>
                 </div>
             </div>
             <div class="card-body">
-                <h5 class="card-title">${materia.nombre}</h5>
+                <h5 class="card-title">${course.name}</h5>
             </div>
             <div class="card-footer border-${color} text-${color}">
-                Creditos: ${materia.creditos}${registroFooterExtra(registro)}
+                Creditos: ${course.credits}
             </div>
         `;
 
         return card;
     }
 
-    function registroFooterExtra(registro) {
-        if (!registro || registro.nota_final === null || registro.nota_final === undefined) {
-            return "";
-        }
-        return ` &middot; Nota: ${registro.nota_final} (${registro.estado})`;
-    }
-
-    function buildSemesterColumn(cycleKey, semesterNum, materias) {
+    function buildSemesterColumn(cycle, semesterNum, courses, savedState) {
         const col = document.createElement("div");
         col.className = "col-12 col-md-6 col-lg-2";
 
@@ -149,9 +109,9 @@
         semCard.appendChild(header);
 
         let semTotal = 0;
-        materias.forEach((materia, idx) => {
-            semTotal += materia.creditos;
-            const cardEl = buildCourseCard(materia, cycleKey);
+        courses.forEach((course, idx) => {
+            semTotal += course.credits;
+            const cardEl = buildCourseCard(course, savedState);
             if (idx === 0) cardEl.classList.add("mt-3");
             semCard.appendChild(cardEl);
         });
@@ -165,178 +125,108 @@
         return col;
     }
 
-    function renderCycle(ciclo, containerId, headerId) {
+    function renderCycle(cycleKey, containerId, headerId) {
         const container = document.getElementById(containerId);
         if (!container) return;
 
-        const cycleKey = cicloToCycleKey(ciclo.nombre);
+        const savedState = loadApprovedState();
+        const courses = COURSES.filter((c) => c.cycle === cycleKey);
 
-        const semestres = [...ciclo.semestres].sort((a, b) => a.numero - b.numero);
+        const semesters = {};
+        courses.forEach((c) => {
+            if (!semesters[c.semester]) semesters[c.semester] = [];
+            semesters[c.semester].push(c);
+        });
 
         container.innerHTML = "";
-        let totalCredits = 0;
-        semestres.forEach((semestre) => {
-            const materias = [...semestre.materias].sort((a, b) => a.id - b.id);
-            totalCredits += materias.reduce((sum, m) => sum + m.creditos, 0);
-            container.appendChild(buildSemesterColumn(cycleKey, semestre.numero, materias));
-        });
+        Object.keys(semesters)
+            .map(Number)
+            .sort((a, b) => a - b)
+            .forEach((semNum) => {
+                container.appendChild(
+                    buildSemesterColumn(cycleKey, semNum, semesters[semNum], savedState)
+                );
+            });
 
+        const totalCredits = courses.reduce((sum, c) => sum + c.credits, 0);
         const headerEl = document.getElementById(headerId);
-        if (headerEl) headerEl.textContent = cycleLabel(ciclo.nombre, totalCredits);
-    }
-
-    function renderPlan(ciclos) {
-        const ciclosOrdenados = [...ciclos].sort((a, b) => a.id - b.id);
-        const [cicloTec, cicloIng] = ciclosOrdenados;
-        if (cicloTec) renderCycle(cicloTec, "tec-semesters", "tec-cycle-title");
-        if (cicloIng) renderCycle(cicloIng, "ing-semesters", "ing-cycle-title");
-    }
-
-    // --- Dashboard (créditos, % de avance, PAPA) ---------------------------
-
-    async function refreshDashboard() {
-        try {
-            const stats = await Api.getEstadisticas();
-
-            setText("stat-total", stats.creditos_totales);
-            setText("stat-approved", stats.creditos_aprobados);
-            setText("stat-percent", `${stats.porcentaje_avance}%`);
-            setText("stat-remaining", stats.creditos_pendientes);
-            setText("stat-papa", stats.papa !== null ? stats.papa.toFixed(2) : "—");
-
-            const desglose = stats.desglose_por_ciclo || {};
-            const breakdown = Object.entries(desglose)
-                .map(([nombre, d]) => `${nombre}: ${d.creditos_aprobados}/${d.creditos_totales}`)
-                .join(" · ");
-            setText("stat-total-breakdown", breakdown);
-            setText("stat-approved-breakdown", breakdown);
-
-            const bar = document.getElementById("stat-progress-bar");
-            if (bar) {
-                bar.style.width = `${stats.porcentaje_avance}%`;
-                bar.parentElement.setAttribute("aria-valuenow", String(stats.porcentaje_avance));
-            }
-        } catch (err) {
-            showApiError(err.message);
+        if (headerEl) {
+            headerEl.textContent = `${CYCLE_LABELS[cycleKey]} (${totalCredits} Créditos)`;
         }
     }
 
-    // --- Modal: capturar nota real ------------------------------------------
-
-    function getModalEls() {
-        return {
-            modalEl: document.getElementById("notaModal"),
-            courseName: document.getElementById("notaModalCourseName"),
-            notaInput: document.getElementById("notaInput"),
-            periodoInput: document.getElementById("periodoInput"),
-            errorEl: document.getElementById("notaModalError"),
-            saveBtn: document.getElementById("notaModalSave"),
-        };
+    function renderPlan() {
+        renderCycle("tec", "tec-semesters", "tec-cycle-title");
+        renderCycle("ing", "ing-semesters", "ing-cycle-title");
     }
 
-    function openNotaModal(materiaId, materiaNombre, checkbox) {
-        const { modalEl, courseName, notaInput, periodoInput, errorEl } = getModalEls();
-        const registro = historialByMateriaId.get(materiaId);
+    // --- Dashboard -------------------------------------------------------
 
-        courseName.textContent = materiaNombre;
-        notaInput.value = registro && registro.nota_final !== null ? registro.nota_final : "";
-        periodoInput.value = registro ? registro.periodo : currentPeriodo();
-        errorEl.classList.add("d-none");
-
-        pendingCourse = { materiaId, checkbox, saved: false };
-
-        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-        modal.show();
+    function getCourseCards() {
+        return Array.from(document.querySelectorAll(".course-card"));
     }
 
-    async function saveNotaModal() {
-        const { modalEl, notaInput, periodoInput, errorEl } = getModalEls();
-        if (!pendingCourse) return;
+    function updateDashboard() {
+        const cards = getCourseCards();
 
-        const nota = parseFloat(notaInput.value);
-        const periodo = periodoInput.value.trim();
+        let total = 0, approved = 0;
+        let totalTec = 0, approvedTec = 0;
+        let totalIng = 0, approvedIng = 0;
 
-        if (Number.isNaN(nota) || nota < 0 || nota > 5) {
-            errorEl.textContent = "Ingresa una nota válida entre 0.0 y 5.0.";
-            errorEl.classList.remove("d-none");
-            return;
-        }
-        if (!periodo) {
-            errorEl.textContent = "Ingresa el periodo (ej. 2026-2).";
-            errorEl.classList.remove("d-none");
-            return;
-        }
+        cards.forEach((card) => {
+            const credits = parseFloat(card.dataset.credits) || 0;
+            const cycle = card.dataset.cycle;
+            const checkbox = card.querySelector(".course-check");
+            const isChecked = checkbox ? checkbox.checked : false;
 
-        try {
-            const registroExistente = historialByMateriaId.get(pendingCourse.materiaId);
-            if (registroExistente) {
-                await Api.actualizarHistorial(registroExistente.id, { periodo, notaFinal: nota });
-            } else {
-                await Api.crearHistorial({ materiaId: pendingCourse.materiaId, periodo, notaFinal: nota });
+            total += credits;
+            if (isChecked) approved += credits;
+
+            if (cycle === "tec") {
+                totalTec += credits;
+                if (isChecked) approvedTec += credits;
+            } else if (cycle === "ing") {
+                totalIng += credits;
+                if (isChecked) approvedIng += credits;
             }
 
-            pendingCourse.saved = true;
-            clearApiError();
-            bootstrap.Modal.getOrCreateInstance(modalEl).hide();
-            await reloadAndRender();
-        } catch (err) {
-            errorEl.textContent = err.message;
-            errorEl.classList.remove("d-none");
-        }
-    }
-
-    function attachModalHandlers() {
-        const { modalEl, saveBtn } = getModalEls();
-        saveBtn.addEventListener("click", saveNotaModal);
-
-        modalEl.addEventListener("hidden.bs.modal", () => {
-            if (pendingCourse && !pendingCourse.saved) {
-                // El usuario canceló: revertir la casilla a su estado anterior.
-                pendingCourse.checkbox.checked = false;
-            }
-            pendingCourse = null;
+            card.classList.toggle("is-pending", !isChecked);
         });
+
+        const percent = total > 0 ? Math.round((approved / total) * 100) : 0;
+        const remaining = total - approved;
+
+        setText("stat-total", total);
+        setText("stat-approved", approved);
+        setText("stat-percent", percent + "%");
+        setText("stat-remaining", remaining);
+
+        setText("stat-total-breakdown", `Tec: ${totalTec} · Ing: ${totalIng}`);
+        setText("stat-approved-breakdown", `Tec: ${approvedTec} · Ing: ${approvedIng}`);
+
+        const bar = document.getElementById("stat-progress-bar");
+        if (bar) {
+            bar.style.width = percent + "%";
+            bar.parentElement.setAttribute("aria-valuenow", String(percent));
+        }
     }
 
-    // --- Interacción con las casillas ---------------------------------------
-
-    async function handleCheckboxChange(checkbox) {
-        const card = checkbox.closest(".course-card");
-        if (!card) return;
-
-        const materiaId = Number(card.dataset.materiaId);
-        const materiaNombre = card.querySelector(".card-title").textContent;
-        const registro = historialByMateriaId.get(materiaId);
-
-        if (checkbox.checked) {
-            openNotaModal(materiaId, materiaNombre, checkbox);
-            return;
-        }
-
-        // Se desmarcó: solo tiene sentido si había un registro aprobado.
-        if (!registro) return;
-
-        const confirmado = window.confirm(
-            `¿Eliminar el registro de nota de "${materiaNombre}" (${registro.periodo}, nota ${registro.nota_final})? Esta acción no se puede deshacer.`
-        );
-        if (!confirmado) {
-            checkbox.checked = true;
-            return;
-        }
-
-        try {
-            await Api.eliminarHistorial(registro.id);
-            clearApiError();
-            await reloadAndRender();
-        } catch (err) {
-            checkbox.checked = true;
-            showApiError(err.message);
-        }
+    function setText(id, value) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value;
     }
 
     function attachCheckboxListeners() {
         document.querySelectorAll(".course-check").forEach((checkbox) => {
-            checkbox.addEventListener("change", () => handleCheckboxChange(checkbox));
+            checkbox.addEventListener("change", () => {
+                const card = checkbox.closest(".course-card");
+                if (card) {
+                    const state = loadApprovedState();
+                    state[card.id] = checkbox.checked;
+                    saveApprovedState(state);
+                }
+                updateDashboard();
+            });
         });
     }
 
@@ -371,23 +261,14 @@
         });
     }
 
-    // --- Orquestación --------------------------------------------------------
-
-    async function reloadAndRender() {
-        try {
-            const ciclos = await loadPlan();
-            renderPlan(ciclos);
-            attachCheckboxListeners();
-            clearApiError();
-        } catch (err) {
-            showApiError(err.message);
-        }
-        await refreshDashboard();
-    }
-
     document.addEventListener("DOMContentLoaded", () => {
-        attachModalHandlers();
+        if (typeof COURSES === "undefined") {
+            console.error("courses-data.js no se cargó antes que planEstudios.js");
+            return;
+        }
+        renderPlan();
+        attachCheckboxListeners();
         attachPdfButton();
-        reloadAndRender();
+        updateDashboard();
     });
 })();

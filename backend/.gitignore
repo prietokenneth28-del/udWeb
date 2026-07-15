@@ -1,6 +1,0 @@
-.env
-/venv
-README.md
-.env.example
-__pycache__/
-*.pyc

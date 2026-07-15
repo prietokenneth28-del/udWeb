@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const select = document.getElementById('semestreSelect');
             const tableContainer = document.getElementById('scheduleTableContainer');
             const noScheduleMessage = document.getElementById('noScheduleMessage');
-            
+
             // Elementos del "Horario de Hoy"
             const contenedorHoy = document.getElementById('clasesHoyContainer');
             const tituloHoy = document.getElementById('tituloHoy');
@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
             function actualizarHorario() {
                 const semestreSeleccionado = select.value;
                 const tbodySeleccionado = document.getElementById(`horario-semestre-${semestreSeleccionado}`);
-                
+
                 // 1. Ocultar todos los tbodys
                 document.querySelectorAll('.horario-tbody').forEach(tbody => {
                     tbody.classList.remove('active');
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     tableContainer.style.display = 'block';
                     noScheduleMessage.style.display = 'none';
                     tbodySeleccionado.classList.add('active');
-                    
+
                     // 3. Generar el resumen de "Clases de Hoy"
                     generarHorarioHoy(tbodySeleccionado);
                 } else {
@@ -35,11 +35,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 const diasSemana = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
                 const hoy = new Date();
                 const diaActualJS = hoy.getDay(); // 0 = Domingo, 1 = Lunes, etc.
-                
+
                 // Actualizar título
                 tituloHoy.innerHTML = `<i class="bi bi-calendar-event"></i> Clases de Hoy (${diasSemana[diaActualJS]})`;
                 contenedorHoy.innerHTML = ''; // Limpiar contenedor
-                
+
                 if (diaActualJS === 0) {
                     contenedorHoy.innerHTML = '<p class="text-success mb-0 fw-bold"><i class="bi bi-cup-hot"></i> Es domingo, no hay clases programadas. ¡A descansar!</p>';
                     return;
@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Buscar las materias del día actual gracias a los atributos 'data-dia' inyectados por Python
                 const materiasHoy = tbody.querySelectorAll(`td[data-dia="${diaActualJS}"]`);
-                
+
                 if (materiasHoy.length === 0) {
                     contenedorHoy.innerHTML = '<p class="text-muted mb-0">No tienes clases programadas para hoy en este semestre.</p>';
                     return;
@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const hora = celda.getAttribute('data-hora');
                     const materia = celda.getAttribute('data-materia');
                     const color = celda.getAttribute('data-color');
-                    
+
                     const div = document.createElement('div');
                     div.className = `card mb-2 border-0 ${color} text-white`;
                     div.innerHTML = `
@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Ejecutar al cambiar el select
             select.addEventListener('change', actualizarHorario);
-            
+
             // Ejecutar al cargar la página para verificar el estado inicial
             actualizarHorario();
         });
