@@ -23,7 +23,27 @@
                     <i class="bi bi-file-earmark-pdf"></i> Descargar PDF
                 </button> -->
             </header>
-
+            <div id="login-container" class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Iniciar sesión</h5>
+                    <div class="row g-2 align-items-end">
+                        <div class="col-auto">
+                            <label class="form-label small mb-0">Usuario</label>
+                            <input type="text" id="login-username" class="form-control form-control-sm">
+                        </div>
+                        <div class="col-auto">
+                            <label class="form-label small mb-0">Contraseña</label>
+                            <input type="password" id="login-password" class="form-control form-control-sm">
+                        </div>
+                        <div class="col-auto">
+                            <button id="login-btn" class="btn btn-sm btn-primary">Entrar</button>
+                        </div>
+                        <div class="col-auto">
+                            <span id="login-status" class="small text-body-secondary"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <!-- Panel de progreso -->
             <div class="row g-3 mb-3" id="dashboard">
                 <div class="col-6 col-lg-3">
@@ -156,6 +176,23 @@
 
 <script>
     document.getElementById("footer-year").textContent = new Date().getFullYear();
+
+    document.getElementById("login-btn").addEventListener("click", async () => {
+        const username = document.getElementById("login-username").value;
+        const password = document.getElementById("login-password").value;
+        const status = document.getElementById("login-status");
+
+        try {
+            await login(username, password);
+            status.textContent = "Sesión iniciada ✔";
+            status.className = "small text-success";
+        } catch (err) {
+            status.textContent = err.message;
+            status.className = "small text-danger";
+        }
+    });
 </script>
+<script src="./api/api.js"></script>
+<script src="./services/js/planEstudios.js"></script>
 </body>
 </html>
