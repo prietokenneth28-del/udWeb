@@ -7,7 +7,7 @@
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="../services/css/planEstudios.css">
+    <link rel="stylesheet" href="/services/css/planEstudios.css">
 
     <style>
         .table-horario th { background-color: #2b3035; vertical-align: middle; }
@@ -20,11 +20,9 @@
 </head>
 
 <body>
-    <div class="container-fluid mt-4">
-        <a href="../index.html" class="btn btn-outline-light mb-3">
-            <i class="bi bi-arrow-left"></i> Volver al Plan de Estudios
-        </a>
+    <div id="header-container"></div>
 
+    <div class="container-fluid mt-4">
         <main>
             <div class="card text-center">
                 <div class="card-header d-flex justify-content-between align-items-center">
@@ -77,48 +75,12 @@
         </main>
     </div>
 
+    <div id="footer-container"></div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script src="../services/js/schedule-data.js"></script>
-    <script src="../services/js/main.shedule.js"></script>
-
-        <footer class="border-top mt-5 pt-4 pb-3">
-    <div class="container-fluid">
-        <div class="row gy-3 align-items-center">
-            <div class="col-12 col-md-5">
-                <h6 class="mb-1">Horario de Clases · Ingeniería Mecánica</h6>
-                <p class="text-body-secondary small mb-0">
-                    Kenneth Prieto &middot; herramienta personal para seguir el avance de la carrera.
-                </p>
-            </div>
-
-            <div class="col-6 col-md-4">
-                <ul class="list-unstyled small mb-0">
-                    <li><a href="../index.html" class="link-secondary link-underline-opacity-0">Plan de estudios</a></li>
-                    <li><a href="#" class="link-secondary link-underline-opacity-0">Ciclo Tecnológico</a></li>
-                    <li><a href="#" class="link-secondary link-underline-opacity-0">Ciclo de Ingeniería</a></li>
-                </ul>
-            </div>
-
-            <div class="col-6 col-md-3 text-md-end">
-                <a href="https://github.com/prietokenneth28-del" class="text-body-secondary fs-5 me-3" title="GitHub">
-                    <i class="bi bi-github"></i>
-                </a>
-                <a href="#" class="text-body-secondary fs-5 me-3" title="LinkedIn">
-                    <i class="bi bi-linkedin"></i>
-                </a>
-                <a href="mailto:tu-correo@ejemplo.com" class="text-body-secondary fs-5" title="Correo">
-                    <i class="bi bi-envelope"></i>
-                </a>
-            </div>
-        </div>
-
-        <hr class="my-3">
-
-        <p class="text-body-secondary small text-center mb-0">
-            &copy; <span id="footer-year"></span> &middot; Hecho con HTML, Bootstrap y un poco de café.
-        </p>
-    </div>
-</footer>
+    <script src="/api/api.js"></script>
+    <script src="/services/js/components.js"></script>
+    <script src="/services/js/schedule-data.js"></script>
+    <script src="/services/js/main.shedule.js"></script>
 </body>
 </html>

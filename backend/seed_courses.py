@@ -1,103 +1,156 @@
-# Script de seed generado automáticamente por generate_seed.py
-# a partir de courses-data.js.
+# Script de seed. Corre con: python seed_courses.py (dentro del venv, con
+# el servidor de PostgreSQL disponible y la migración de Alembic aplicada).
 #
-# CÓMO USARLO:
-#   1. Mueve este archivo a la raíz de backend/ (junto a la carpeta app/)
-#   2. Activa tu venv
-#   3. Corre: python seed_courses.py
-#
-# Es IDEMPOTENTE: si corres el script dos veces, no duplica cursos
-# que ya existan (los salta e informa cuáles).
+# Es IDEMPOTENTE: si corres el script dos veces, no duplica ciclos,
+# semestres, materias, ni el historial de materias ya aprobadas.
 
 from sqlmodel import Session, select
-from app.database import engine, crear_tablas
-from app.models import Course
+from app.database import engine
+from app.models import CicloAcademico, Semestre, Materia, HistorialAcademico
 
-CURSOS_A_INSERTAR = [
-    Course(id='tec-1', name='CÁLCULO DIFERENCIAL', code='1', credits=4.0, cycle='tec', semester=1, category='fisica-matematica', type='OB', approved=True, prereq_json='[]'),
-    Course(id='tec-2', name='CÁTEDRA FRANCISCO JOSÉ DE CALDAS', code='4', credits=1.0, cycle='tec', semester=1, category='lenguaje-sociales', type='OC', approved=True, prereq_json='[]'),
-    Course(id='tec-3', name='ÁLGEBRA LINEAL', code='9', credits=3.0, cycle='tec', semester=1, category='fisica-matematica', type='OB', approved=True, prereq_json='[]'),
-    Course(id='tec-4', name='PRODUCCIÓN Y COMPRENSIÓN DE TEXTOS I', code='1054', credits=3.0, cycle='tec', semester=1, category='lenguaje-sociales', type='OC', approved=True, prereq_json='[]'),
-    Course(id='tec-5', name='ÉTICA Y SOCIEDAD', code='1075', credits=2.0, cycle='tec', semester=1, category='lenguaje-sociales', type='OC', approved=True, prereq_json='[]'),
-    Course(id='tec-6', name='DIBUJO TÉCNICO', code='1411', credits=2.0, cycle='tec', semester=1, category='fabricacion', type='OB', approved=True, prereq_json='[]'),
-    Course(id='tec-7', name='INTRODUCCIÓN A LA MECÁNICA INDUSTRIAL', code='19701', credits=1.0, cycle='tec', semester=1, category='fabricacion', type='OB', approved=True, prereq_json='[]'),
-    Course(id='tec-8', name='SEGUNDA LENGUA I - INGLÉS', code='9901', credits=2.0, cycle='tec', semester=1, category='lenguaje-sociales', type='OC', approved=True, prereq_json='[]'),
-    Course(id='tec-9', name='FÍSICA I: MECÁNICA NEWTONIANA', code='3', credits=3.0, cycle='tec', semester=2, category='fisica-matematica', type='OB', approved=True, prereq_json='[]'),
-    Course(id='tec-10', name='CÁLCULO INTEGRAL', code='7', credits=3.0, cycle='tec', semester=2, category='fisica-matematica', type='OB', approved=True, prereq_json='["tec-1"]'),
-    Course(id='tec-11', name='CÁTEDRA DEMOCRACIA Y CIUDADANÍA', code='12', credits=1.0, cycle='tec', semester=2, category='lenguaje-sociales', type='OC', approved=True, prereq_json='[]'),
-    Course(id='tec-12', name='PRODUCCIÓN Y COMPRENSIÓN DE TEXTOS II', code='1056', credits=2.0, cycle='tec', semester=2, category='lenguaje-sociales', type='OC', approved=True, prereq_json='[]'),
-    Course(id='tec-13', name='MATERIALES METÁLICOS', code='19702', credits=3.0, cycle='tec', semester=2, category='fabricacion', type='OB', approved=True, prereq_json='[]'),
-    Course(id='tec-14', name='DIBUJO DE ELEMENTOS DE MÁQUINAS', code='19703', credits=2.0, cycle='tec', semester=2, category='fabricacion', type='OB', approved=True, prereq_json='[]'),
-    Course(id='tec-15', name='FUNDAMENTOS DE PROGRAMACIÓN', code='19704', credits=1.0, cycle='tec', semester=2, category='diseno-programacion', type='OB', approved=True, prereq_json='[]'),
-    Course(id='tec-16', name='SEGUNDA LENGUA II - INGLÉS', code='9903', credits=2.0, cycle='tec', semester=2, category='lenguaje-sociales', type='OC', approved=True, prereq_json='[]'),
-    Course(id='tec-17', name='FÍSICA II: ELECTROMAGNETISMO', code='13', credits=3.0, cycle='tec', semester=3, category='fisica-matematica', type='OB', approved=True, prereq_json='[]'),
-    Course(id='tec-18', name='CIENCIA TECNOLOGÍA Y SOCIEDAD', code='1060', credits=2.0, cycle='tec', semester=3, category='lenguaje-sociales', type='OC', approved=True, prereq_json='[]'),
-    Course(id='tec-19', name='ESTATICA', code='1421', credits=3.0, cycle='tec', semester=3, category='diseno-programacion', type='OB', approved=True, prereq_json='[]'),
-    Course(id='tec-20', name='MATERIALES POLIMÉRICOS Y COMPUESTOS', code='19705', credits=2.0, cycle='tec', semester=3, category='fabricacion', type='OB', approved=True, prereq_json='[]'),
-    Course(id='tec-21', name='DIBUJO DE TALLER INDUSTRIAL', code='19706', credits=2.0, cycle='tec', semester=3, category='fabricacion', type='OB', approved=True, prereq_json='[]'),
-    Course(id='tec-22', name='METROLOGÍA DIMENSIONAL', code='19707', credits=1.0, cycle='tec', semester=3, category='fabricacion', type='OB', approved=True, prereq_json='[]'),
-    Course(id='tec-23', name='SEGUNDA LENGUA III - INGLÉS', code='9903', credits=2.0, cycle='tec', semester=3, category='lenguaje-sociales', type='OC', approved=True, prereq_json='[]'),
-    Course(id='tec-24', name='PROCESOS DE MECANIZADO I', code='19708', credits=3.0, cycle='tec', semester=3, category='fabricacion', type='OB', approved=True, prereq_json='[]'),
-    Course(id='tec-25', name='CÁLCULO MULTIVARIADO', code='16', credits=3.0, cycle='tec', semester=4, category='fisica-matematica', type='OB', approved=True, prereq_json='[]'),
-    Course(id='tec-26', name='MECANICA DE FLUIDOS', code='1433', credits=3.0, cycle='tec', semester=4, category='energias', type='OB', approved=True, prereq_json='[]'),
-    Course(id='tec-27', name='RESISTENCIA DE MATERIALES', code='1436', credits=3.0, cycle='tec', semester=4, category='diseno-programacion', type='OB', approved=True, prereq_json='[]'),
-    Course(id='tec-28', name='PROCESOS DE MECANIZADO II', code='19709', credits=3.0, cycle='tec', semester=4, category='fabricacion', type='OB', approved=True, prereq_json='[]'),
-    Course(id='tec-29', name='DINÁMICA DE MECANISMOS', code='19710', credits=3.0, cycle='tec', semester=4, category='fabricacion', type='OB', approved=True, prereq_json='[]'),
-    Course(id='tec-30', name='FÍSICA III: ONDAS Y FÍSICA MODERNA', code='1428', credits=3.0, cycle='tec', semester=4, category='fisica-matematica', type='CP', approved=True, prereq_json='[]'),
-    Course(id='tec-31', name='ECUACIONES DIFERENCIALES', code='88', credits=3.0, cycle='tec', semester=5, category='fisica-matematica', type='CP', approved=True, prereq_json='[]'),
-    Course(id='tec-32', name='TERMODINÁMICA', code='1426', credits=3.0, cycle='tec', semester=5, category='energias', type='OB', approved=True, prereq_json='[]'),
-    Course(id='tec-33', name='MANTENIMIENTO DE MÁQUINAS', code='19711', credits=2.0, cycle='tec', semester=5, category='fisica-matematica', type='OB', approved=True, prereq_json='[]'),
-    Course(id='tec-34', name='PROCESOS DE CONFORMADO', code='19712', credits=3.0, cycle='tec', semester=5, category='fabricacion', type='OB', approved=True, prereq_json='[]'),
-    Course(id='tec-35', name='ELEMENTOS DE MÁQUINAS I', code='19713', credits=3.0, cycle='tec', semester=5, category='diseno-programacion', type='OB', approved=True, prereq_json='[]'),
-    Course(id='tec-36', name='ELECTIVA INTRISECA 1', code='-', credits=2.0, cycle='tec', semester=5, category='electivas-grado', type='EI', approved=True, prereq_json='[]'),
-    Course(id='tec-37', name='ELECTIVA INTRISECA 2', code='-', credits=2.0, cycle='tec', semester=5, category='electivas-grado', type='EI', approved=True, prereq_json='[]'),
-    Course(id='tec-38', name='TRABAJO DE GRADO TECNOLÓGICO', code='1446', credits=2.0, cycle='tec', semester=6, category='electivas-grado', type='OB', approved=True, prereq_json='[]'),
-    Course(id='tec-39', name='DISEÑO DE PROCESOS DE FABRICACIÓN', code='19714', credits=3.0, cycle='tec', semester=6, category='fabricacion', type='OB', approved=True, prereq_json='[]'),
-    Course(id='tec-40', name='ELEMENTOS DE MÁQUINAS II', code='19715', credits=3.0, cycle='tec', semester=6, category='diseno-programacion', type='OB', approved=True, prereq_json='[]'),
-    Course(id='tec-41', name='MÁQUINAS ELÉCTRICAS', code='19716', credits=2.0, cycle='tec', semester=6, category='energias', type='OB', approved=True, prereq_json='[]'),
-    Course(id='tec-42', name='MÁQUINAS HIDRÁULICAS', code='1824', credits=3.0, cycle='tec', semester=6, category='energias', type='CP', approved=True, prereq_json='[]'),
-    Course(id='tec-43', name='ELECTIVA INTRISECA 3', code='-', credits=2.0, cycle='tec', semester=6, category='electivas-grado', type='EI', approved=True, prereq_json='[]'),
-    Course(id='tec-44', name='ELECTIVA EXTRINSECA', code='-', credits=2.0, cycle='tec', semester=6, category='electivas-grado', type='EE', approved=True, prereq_json='[]'),
-    Course(id='ing-1', name='PROBABILIDAD Y ESTADÍSTICA', code='19801', credits=2.0, cycle='ing', semester=7, category='fisica-matematica', type='OB', approved=False, prereq_json='[]'),
-    Course(id='ing-2', name='TERMODINÁMICA APLICADA', code='19804', credits=3.0, cycle='ing', semester=7, category='energias', type='OB', approved=False, prereq_json='[]'),
-    Course(id='ing-3', name='DISEÑO POR ELEMENTOS FINITOS', code='1817', credits=3.0, cycle='ing', semester=7, category='diseno-programacion', type='OB', approved=False, prereq_json='[]'),
-    Course(id='ing-4', name='ASEGURAMIENTO METROLÓGICO', code='19802', credits=2.0, cycle='ing', semester=7, category='fabricacion', type='OB', approved=False, prereq_json='[]'),
-    Course(id='ing-5', name='CÁTEDRA DE CONTEXTO', code='1082', credits=1.0, cycle='ing', semester=7, category='lenguaje-sociales', type='OC', approved=False, prereq_json='[]'),
-    Course(id='ing-6', name='PRODUCCIÓN DE TEXTOS CIENTÍFICOS', code='19803', credits=2.0, cycle='ing', semester=7, category='lenguaje-sociales', type='OC', approved=False, prereq_json='[]'),
-    Course(id='ing-7', name='DISEÑO EXPERIMENTAL', code='19806', credits=2.0, cycle='ing', semester=8, category='fisica-matematica', type='OB', approved=False, prereq_json='[]'),
-    Course(id='ing-8', name='TRANSFERENCIA DE CALOR', code='1818', credits=3.0, cycle='ing', semester=8, category='energias', type='OB', approved=False, prereq_json='[]'),
-    Course(id='ing-9', name='MANTENIMIENTO DE EQUIPOS INDUSTRIALES', code='19805', credits=3.0, cycle='ing', semester=8, category='fisica-matematica', type='OB', approved=False, prereq_json='[]'),
-    Course(id='ing-10', name='DISEÑO DE MÁQUINAS', code='1823', credits=3.0, cycle='ing', semester=8, category='diseno-programacion', type='OB', approved=False, prereq_json='[]'),
-    Course(id='ing-11', name='ELECTIVA EXTRÍNSECA', code='-', credits=2.0, cycle='ing', semester=8, category='electivas-grado', type='EE', approved=False, prereq_json='[]'),
-    Course(id='ing-12', name='SISTEMAS DINÁMICOS Y CONTROL', code='1805', credits=3.0, cycle='ing', semester=8, category='diseno-programacion', type='OB', approved=False, prereq_json='[]'),
-    Course(id='ing-13', name='TRABAJO DE GRADO I', code='1670', credits=2.0, cycle='ing', semester=9, category='electivas-grado', type='OB', approved=False, prereq_json='[]'),
-    Course(id='ing-14', name='MÁQUINAS TÉRMICAS', code='1838', credits=3.0, cycle='ing', semester=9, category='energias', type='OB', approved=False, prereq_json='[]'),
-    Course(id='ing-15', name='INGENIERÍA ECONÓMICA', code='1619', credits=3.0, cycle='ing', semester=9, category='lenguaje-sociales', type='OB', approved=False, prereq_json='[]'),
-    Course(id='ing-16', name='ELECTIVA DE PROFUNDIZACIÓN I', code='-', credits=2.0, cycle='ing', semester=9, category='electivas-grado', type='EI', approved=False, prereq_json='[]'),
-    Course(id='ing-17', name='ELECTIVA DE PROFUNDIZACIÓN III', code='-', credits=2.0, cycle='ing', semester=9, category='electivas-grado', type='EI', approved=False, prereq_json='[]'),
-    Course(id='ing-18', name='INGENIERÍA DE MANUFACTURA', code='19807', credits=3.0, cycle='ing', semester=9, category='fabricacion', type='OB', approved=False, prereq_json='[]'),
-    Course(id='ing-19', name='ELECTIVA DE PROFUNDIZACIÓN II', code='-', credits=2.0, cycle='ing', semester=9, category='electivas-grado', type='EI', approved=False, prereq_json='[]'),
-    Course(id='ing-20', name='TRABAJO DE GRADO II', code='1831', credits=2.0, cycle='ing', semester=10, category='electivas-grado', type='OB', approved=False, prereq_json='[]'),
-    Course(id='ing-21', name='ELECTIVA DE PROFUNDIZACIÓN V', code='-', credits=3.0, cycle='ing', semester=10, category='electivas-grado', type='EI', approved=False, prereq_json='[]'),
-    Course(id='ing-22', name='FORMULACIÓN Y EVALUACIÓN DE PROYECTOS', code='19808', credits=3.0, cycle='ing', semester=10, category='lenguaje-sociales', type='OB', approved=False, prereq_json='[]'),
-    Course(id='ing-23', name='ELECTIVA DE PROFUNDIZACIÓN IV', code='-', credits=2.0, cycle='ing', semester=10, category='electivas-grado', type='EI', approved=False, prereq_json='[]'),
+CICLOS = [
+    ("tec", "Ciclo Tecnológico"),
+    ("ing", "Ciclo de Ingeniería"),
+]
+
+# (id, nombre, codigo, creditos, cycle, semester, categoria, tipo, aprobada, prereq)
+MATERIAS_RAW = [
+    ('tec-1', 'CÁLCULO DIFERENCIAL', '1', 4.0, 'tec', 1, 'fisica-matematica', 'OB', True, []),
+    ('tec-2', 'CÁTEDRA FRANCISCO JOSÉ DE CALDAS', '4', 1.0, 'tec', 1, 'lenguaje-sociales', 'OC', True, []),
+    ('tec-3', 'ÁLGEBRA LINEAL', '9', 3.0, 'tec', 1, 'fisica-matematica', 'OB', True, []),
+    ('tec-4', 'PRODUCCIÓN Y COMPRENSIÓN DE TEXTOS I', '1054', 3.0, 'tec', 1, 'lenguaje-sociales', 'OC', True, []),
+    ('tec-5', 'ÉTICA Y SOCIEDAD', '1075', 2.0, 'tec', 1, 'lenguaje-sociales', 'OC', True, []),
+    ('tec-6', 'DIBUJO TÉCNICO', '1411', 2.0, 'tec', 1, 'fabricacion', 'OB', True, []),
+    ('tec-7', 'INTRODUCCIÓN A LA MECÁNICA INDUSTRIAL', '19701', 1.0, 'tec', 1, 'fabricacion', 'OB', True, []),
+    ('tec-8', 'SEGUNDA LENGUA I - INGLÉS', '9901', 2.0, 'tec', 1, 'lenguaje-sociales', 'OC', True, []),
+    ('tec-9', 'FÍSICA I: MECÁNICA NEWTONIANA', '3', 3.0, 'tec', 2, 'fisica-matematica', 'OB', True, []),
+    ('tec-10', 'CÁLCULO INTEGRAL', '7', 3.0, 'tec', 2, 'fisica-matematica', 'OB', True, ['tec-1']),
+    ('tec-11', 'CÁTEDRA DEMOCRACIA Y CIUDADANÍA', '12', 1.0, 'tec', 2, 'lenguaje-sociales', 'OC', True, []),
+    ('tec-12', 'PRODUCCIÓN Y COMPRENSIÓN DE TEXTOS II', '1056', 2.0, 'tec', 2, 'lenguaje-sociales', 'OC', True, []),
+    ('tec-13', 'MATERIALES METÁLICOS', '19702', 3.0, 'tec', 2, 'fabricacion', 'OB', True, []),
+    ('tec-14', 'DIBUJO DE ELEMENTOS DE MÁQUINAS', '19703', 2.0, 'tec', 2, 'fabricacion', 'OB', True, []),
+    ('tec-15', 'FUNDAMENTOS DE PROGRAMACIÓN', '19704', 1.0, 'tec', 2, 'diseno-programacion', 'OB', True, []),
+    ('tec-16', 'SEGUNDA LENGUA II - INGLÉS', '9903', 2.0, 'tec', 2, 'lenguaje-sociales', 'OC', True, []),
+    ('tec-17', 'FÍSICA II: ELECTROMAGNETISMO', '13', 3.0, 'tec', 3, 'fisica-matematica', 'OB', True, []),
+    ('tec-18', 'CIENCIA TECNOLOGÍA Y SOCIEDAD', '1060', 2.0, 'tec', 3, 'lenguaje-sociales', 'OC', True, []),
+    ('tec-19', 'ESTATICA', '1421', 3.0, 'tec', 3, 'diseno-programacion', 'OB', True, []),
+    ('tec-20', 'MATERIALES POLIMÉRICOS Y COMPUESTOS', '19705', 2.0, 'tec', 3, 'fabricacion', 'OB', True, []),
+    ('tec-21', 'DIBUJO DE TALLER INDUSTRIAL', '19706', 2.0, 'tec', 3, 'fabricacion', 'OB', True, []),
+    ('tec-22', 'METROLOGÍA DIMENSIONAL', '19707', 1.0, 'tec', 3, 'fabricacion', 'OB', True, []),
+    ('tec-23', 'SEGUNDA LENGUA III - INGLÉS', '9903', 2.0, 'tec', 3, 'lenguaje-sociales', 'OC', True, []),
+    ('tec-24', 'PROCESOS DE MECANIZADO I', '19708', 3.0, 'tec', 3, 'fabricacion', 'OB', True, []),
+    ('tec-25', 'CÁLCULO MULTIVARIADO', '16', 3.0, 'tec', 4, 'fisica-matematica', 'OB', True, []),
+    ('tec-26', 'MECANICA DE FLUIDOS', '1433', 3.0, 'tec', 4, 'energias', 'OB', True, []),
+    ('tec-27', 'RESISTENCIA DE MATERIALES', '1436', 3.0, 'tec', 4, 'diseno-programacion', 'OB', True, []),
+    ('tec-28', 'PROCESOS DE MECANIZADO II', '19709', 3.0, 'tec', 4, 'fabricacion', 'OB', True, []),
+    ('tec-29', 'DINÁMICA DE MECANISMOS', '19710', 3.0, 'tec', 4, 'fabricacion', 'OB', True, []),
+    ('tec-30', 'FÍSICA III: ONDAS Y FÍSICA MODERNA', '1428', 3.0, 'tec', 4, 'fisica-matematica', 'CP', True, []),
+    ('tec-31', 'ECUACIONES DIFERENCIALES', '88', 3.0, 'tec', 5, 'fisica-matematica', 'CP', True, []),
+    ('tec-32', 'TERMODINÁMICA', '1426', 3.0, 'tec', 5, 'energias', 'OB', True, []),
+    ('tec-33', 'MANTENIMIENTO DE MÁQUINAS', '19711', 2.0, 'tec', 5, 'fisica-matematica', 'OB', True, []),
+    ('tec-34', 'PROCESOS DE CONFORMADO', '19712', 3.0, 'tec', 5, 'fabricacion', 'OB', True, []),
+    ('tec-35', 'ELEMENTOS DE MÁQUINAS I', '19713', 3.0, 'tec', 5, 'diseno-programacion', 'OB', True, []),
+    ('tec-36', 'ELECTIVA INTRISECA 1', '-', 2.0, 'tec', 5, 'electivas-grado', 'EI', True, []),
+    ('tec-37', 'ELECTIVA INTRISECA 2', '-', 2.0, 'tec', 5, 'electivas-grado', 'EI', True, []),
+    ('tec-38', 'TRABAJO DE GRADO TECNOLÓGICO', '1446', 2.0, 'tec', 6, 'electivas-grado', 'OB', True, []),
+    ('tec-39', 'DISEÑO DE PROCESOS DE FABRICACIÓN', '19714', 3.0, 'tec', 6, 'fabricacion', 'OB', True, []),
+    ('tec-40', 'ELEMENTOS DE MÁQUINAS II', '19715', 3.0, 'tec', 6, 'diseno-programacion', 'OB', True, []),
+    ('tec-41', 'MÁQUINAS ELÉCTRICAS', '19716', 2.0, 'tec', 6, 'energias', 'OB', True, []),
+    ('tec-42', 'MÁQUINAS HIDRÁULICAS', '1824', 3.0, 'tec', 6, 'energias', 'CP', True, []),
+    ('tec-43', 'ELECTIVA INTRISECA 3', '-', 2.0, 'tec', 6, 'electivas-grado', 'EI', True, []),
+    ('tec-44', 'ELECTIVA EXTRINSECA', '-', 2.0, 'tec', 6, 'electivas-grado', 'EE', True, []),
+    ('ing-1', 'PROBABILIDAD Y ESTADÍSTICA', '19801', 2.0, 'ing', 7, 'fisica-matematica', 'OB', False, []),
+    ('ing-2', 'TERMODINÁMICA APLICADA', '19804', 3.0, 'ing', 7, 'energias', 'OB', False, []),
+    ('ing-3', 'DISEÑO POR ELEMENTOS FINITOS', '1817', 3.0, 'ing', 7, 'diseno-programacion', 'OB', False, []),
+    ('ing-4', 'ASEGURAMIENTO METROLÓGICO', '19802', 2.0, 'ing', 7, 'fabricacion', 'OB', False, []),
+    ('ing-5', 'CÁTEDRA DE CONTEXTO', '1082', 1.0, 'ing', 7, 'lenguaje-sociales', 'OC', False, []),
+    ('ing-6', 'PRODUCCIÓN DE TEXTOS CIENTÍFICOS', '19803', 2.0, 'ing', 7, 'lenguaje-sociales', 'OC', False, []),
+    ('ing-7', 'DISEÑO EXPERIMENTAL', '19806', 2.0, 'ing', 8, 'fisica-matematica', 'OB', False, []),
+    ('ing-8', 'TRANSFERENCIA DE CALOR', '1818', 3.0, 'ing', 8, 'energias', 'OB', False, []),
+    ('ing-9', 'MANTENIMIENTO DE EQUIPOS INDUSTRIALES', '19805', 3.0, 'ing', 8, 'fisica-matematica', 'OB', False, []),
+    ('ing-10', 'DISEÑO DE MÁQUINAS', '1823', 3.0, 'ing', 8, 'diseno-programacion', 'OB', False, []),
+    ('ing-11', 'ELECTIVA EXTRÍNSECA', '-', 2.0, 'ing', 8, 'electivas-grado', 'EE', False, []),
+    ('ing-12', 'SISTEMAS DINÁMICOS Y CONTROL', '1805', 3.0, 'ing', 8, 'diseno-programacion', 'OB', False, []),
+    ('ing-13', 'TRABAJO DE GRADO I', '1670', 2.0, 'ing', 9, 'electivas-grado', 'OB', False, []),
+    ('ing-14', 'MÁQUINAS TÉRMICAS', '1838', 3.0, 'ing', 9, 'energias', 'OB', False, []),
+    ('ing-15', 'INGENIERÍA ECONÓMICA', '1619', 3.0, 'ing', 9, 'lenguaje-sociales', 'OB', False, []),
+    ('ing-16', 'ELECTIVA DE PROFUNDIZACIÓN I', '-', 2.0, 'ing', 9, 'electivas-grado', 'EI', False, []),
+    ('ing-17', 'ELECTIVA DE PROFUNDIZACIÓN III', '-', 2.0, 'ing', 9, 'electivas-grado', 'EI', False, []),
+    ('ing-18', 'INGENIERÍA DE MANUFACTURA', '19807', 3.0, 'ing', 9, 'fabricacion', 'OB', False, []),
+    ('ing-19', 'ELECTIVA DE PROFUNDIZACIÓN II', '-', 2.0, 'ing', 9, 'electivas-grado', 'EI', False, []),
+    ('ing-20', 'TRABAJO DE GRADO II', '1831', 2.0, 'ing', 10, 'electivas-grado', 'OB', False, []),
+    ('ing-21', 'ELECTIVA DE PROFUNDIZACIÓN V', '-', 3.0, 'ing', 10, 'electivas-grado', 'EI', False, []),
+    ('ing-22', 'FORMULACIÓN Y EVALUACIÓN DE PROYECTOS', '19808', 3.0, 'ing', 10, 'lenguaje-sociales', 'OB', False, []),
+    ('ing-23', 'ELECTIVA DE PROFUNDIZACIÓN IV', '-', 2.0, 'ing', 10, 'electivas-grado', 'EI', False, []),
 ]
 
 
 def seed():
-    crear_tablas()  # por si el servidor nunca corrió y la tabla no existe aún
-    insertados = 0
-    saltados = 0
     with Session(engine) as session:
-        for curso in CURSOS_A_INSERTAR:
-            existente = session.get(Course, curso.id)
-            if existente:
-                saltados += 1
-                continue
-            session.add(curso)
-            insertados += 1
+        ciclos_insertados = 0
+        for ciclo_id, nombre in CICLOS:
+            if not session.get(CicloAcademico, ciclo_id):
+                session.add(CicloAcademico(id=ciclo_id, nombre=nombre))
+                ciclos_insertados += 1
         session.commit()
-    print(f'Insertados: {insertados} | Ya existían (saltados): {saltados}')
+
+        # id de semestre por (ciclo, numero)
+        semestre_id_por_clave: dict[tuple[str, int], int] = {}
+        existentes = session.exec(select(Semestre)).all()
+        for s in existentes:
+            semestre_id_por_clave[(s.ciclo_id, s.numero)] = s.id
+
+        semestres_insertados = 0
+        claves_necesarias = sorted({(cycle, semester) for (_, _, _, _, cycle, semester, *_ ) in MATERIAS_RAW})
+        for ciclo_id, numero in claves_necesarias:
+            if (ciclo_id, numero) not in semestre_id_por_clave:
+                nuevo = Semestre(numero=numero, ciclo_id=ciclo_id)
+                session.add(nuevo)
+                session.commit()
+                session.refresh(nuevo)
+                semestre_id_por_clave[(ciclo_id, numero)] = nuevo.id
+                semestres_insertados += 1
+
+        materias_insertadas = 0
+        materias_saltadas = 0
+        historial_insertado = 0
+        for materia_id, nombre, codigo, creditos, ciclo_id, numero, categoria, tipo, aprobada, prereq in MATERIAS_RAW:
+            existente = session.get(Materia, materia_id)
+            if existente:
+                materias_saltadas += 1
+            else:
+                nueva_materia = Materia(
+                    id=materia_id,
+                    nombre=nombre,
+                    codigo=codigo,
+                    creditos=creditos,
+                    tipo=tipo,
+                    categoria=categoria,
+                    semestre_id=semestre_id_por_clave[(ciclo_id, numero)],
+                )
+                nueva_materia.prereq = prereq
+                session.add(nueva_materia)
+                materias_insertadas += 1
+
+            if aprobada:
+                ya_tiene_historial = session.exec(
+                    select(HistorialAcademico).where(HistorialAcademico.materia_id == materia_id)
+                ).first()
+                if not ya_tiene_historial:
+                    session.add(HistorialAcademico(
+                        materia_id=materia_id,
+                        periodo=None,
+                        nota_final=None,
+                        estado="Aprobada",
+                    ))
+                    historial_insertado += 1
+
+        session.commit()
+
+    print(f"Ciclos insertados: {ciclos_insertados}")
+    print(f"Semestres insertados: {semestres_insertados}")
+    print(f"Materias insertadas: {materias_insertadas} | Ya existían (saltadas): {materias_saltadas}")
+    print(f"Registros de historial insertados: {historial_insertado}")
 
 
 if __name__ == "__main__":

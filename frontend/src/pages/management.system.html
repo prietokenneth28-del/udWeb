@@ -8,7 +8,7 @@
     <!-- Hojas de estilo -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="../services/css/planEstudios.css">
+    <link rel="stylesheet" href="/services/css/planEstudios.css">
     
     <style>
         /* Estilos específicos para acercarnos a la imagen referenciada */
@@ -37,14 +37,9 @@
     </style>
 </head>
 <body>
-    <div class="container-fluid mt-4">
-        <!-- Encabezado con botón de retorno -->
-        <header class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-            <a href="../index.html" class="btn btn-outline-light">
-                <i class="bi bi-arrow-left"></i> Volver al Plan de Estudios
-            </a>
-        </header>
+    <div id="header-container"></div>
 
+    <div class="container-fluid mt-4">
         <main>
             <div class="card text-center mb-4">
                 <div class="card-header title-banner py-2">
@@ -63,44 +58,49 @@
         </main>
     </div>
 
-    <!-- Footer -->
-    <footer class="border-top mt-5 pt-4 pb-3">
-        <div class="container-fluid">
-            <p class="text-body-secondary small text-center mb-0">
-                &copy; <span id="footer-year"></span> &middot; Hecho con HTML, Bootstrap y un poco de café
-            </p>
-        </div>
-    </footer>
+    <div id="footer-container"></div>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../services/js/courses-data.js"></script>
-    
+    <script src="/api/api.js"></script>
+    <script src="/services/js/components.js"></script>
+
     <!-- Lógica de Generación de la Tabla -->
     <script>
-        document.getElementById("footer-year").textContent = new Date().getFullYear();
-
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             const tableBody = document.getElementById('notas-tbody');
-            
-            // Verificamos que los datos se hayan cargado correctamente
-            if (typeof COURSES === "undefined") {
-                tableBody.innerHTML = '<tr><td colspan="8" class="text-danger">Error: No se pudo cargar courses-data.js</td></tr>';
+
+            let ciclos, historial;
+            try {
+                [ciclos, historial] = await Promise.all([getPlanEstudios(), getHistorial()]);
+            } catch (err) {
+                tableBody.innerHTML = `<tr><td colspan="8" class="text-danger">Error al conectar con el backend: ${err.message}</td></tr>`;
                 return;
             }
 
-            // 1. Agrupar los cursos por nivel (semestre)
-            const niveles = {};
-            COURSES.forEach(course => {
-                if (!niveles[course.semester]) {
-                    niveles[course.semester] = [];
+            // Une materias con su registro de historial más reciente (si existe)
+            const historialPorMateria = new Map();
+            historial.forEach((registro) => {
+                const actual = historialPorMateria.get(registro.materia_id);
+                if (!actual || new Date(registro.fecha_registro) > new Date(actual.fecha_registro)) {
+                    historialPorMateria.set(registro.materia_id, registro);
                 }
-                niveles[course.semester].push(course);
+            });
+
+            // 1. Agrupar las materias por nivel (semestre)
+            const niveles = {};
+            ciclos.forEach((ciclo) => {
+                ciclo.semestres.forEach((semestre) => {
+                    semestre.materias.forEach((materia) => {
+                        if (!niveles[semestre.numero]) niveles[semestre.numero] = [];
+                        niveles[semestre.numero].push(materia);
+                    });
+                });
             });
 
             // 2. Ordenar los niveles y generar el HTML
             const nivelesOrdenados = Object.keys(niveles).sort((a, b) => Number(a) - Number(b));
-            
+
             nivelesOrdenados.forEach(nivel => {
                 // Generar el encabezado del Nivel
                 tableBody.innerHTML += `
@@ -113,35 +113,38 @@
                         <th style="width: 10%;">Nota</th>
                         <th style="width: 10%;">Créditos</th>
                         <th style="width: 10%;">Clasificación</th>
-                        <th style="width: 10%;">Año</th>
+                        <th style="width: 10%;">Estado</th>
                         <th style="width: 10%;">Periodo</th>
-                        <th style="width: 10%;">Observación</th>
+                        <th style="width: 10%;">Registrado</th>
                     </tr>
                 `;
 
                 // Generar las filas de cada materia en este nivel
-                niveles[nivel].forEach(course => {
-                    // CONDICIONAL PARA LA NOTA: Verifica si la propiedad 'note' existe
-                    const notaMostrar = course.hasOwnProperty('note') ? course.note : '<span class="text-muted">-</span>';
-                    
-                    // Condicionales adicionales por si decides agregar estas propiedades en el futuro
-                    const anioMostrar = course.hasOwnProperty('year') ? course.year : '-';
-                    const periodoMostrar = course.hasOwnProperty('period') ? course.period : '-';
-                    const obsMostrar = course.hasOwnProperty('observation') ? course.observation : '';
-                    
+                niveles[nivel].forEach(materia => {
+                    const registro = historialPorMateria.get(materia.id);
+
+                    const notaMostrar = registro && registro.nota_final !== null
+                        ? registro.nota_final
+                        : '<span class="text-muted">-</span>';
+                    const estadoMostrar = registro ? registro.estado : '<span class="text-muted">Pendiente</span>';
+                    const periodoMostrar = registro && registro.periodo ? registro.periodo : '-';
+                    const fechaMostrar = registro
+                        ? new Date(registro.fecha_registro).toLocaleDateString()
+                        : '';
+
                     // Manejo visual de códigos vacíos
-                    const codigo = (course.code && course.code !== "-") ? course.code : "";
+                    const codigo = (materia.codigo && materia.codigo !== "-") ? materia.codigo : "";
 
                     tableBody.innerHTML += `
                         <tr>
                             <td>${codigo}</td>
-                            <td class="text-start fw-bold">${course.name}</td>
+                            <td class="text-start fw-bold">${materia.nombre}</td>
                             <td class="text-info fw-bold">${notaMostrar}</td>
-                            <td>${course.credits}</td>
-                            <td>${course.type}</td>
-                            <td>${anioMostrar}</td>
+                            <td>${materia.creditos}</td>
+                            <td>${materia.tipo}</td>
+                            <td>${estadoMostrar}</td>
                             <td>${periodoMostrar}</td>
-                            <td class="text-start small">${obsMostrar}</td>
+                            <td class="small">${fechaMostrar}</td>
                         </tr>
                     `;
                 });

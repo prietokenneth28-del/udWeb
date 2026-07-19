@@ -1,18 +1,17 @@
 // Plan de estudios — interactividad
 //
-// Las tarjetas de curso YA NO están escritas a mano en el HTML: se generan
-// aquí a partir del arreglo COURSES definido en courses-data.js. Para
-// agregar, quitar o editar un curso, modifica ese archivo — no este.
-//
-// Estado de aprobación: se guarda en localStorage (clave "planEstudios:v1"),
-// así que el avance se recuerda entre visitas. El valor "approved" de cada
-// curso en courses-data.js solo se usa la primera vez que abres la página
-// en ese navegador (o si borras el almacenamiento local).
+// Las tarjetas de curso se generan a partir de lo que devuelve el backend
+// (GET /api/plan-estudios + GET /api/historial), no de un archivo estático.
+// El estado de "aprobada" vive en la tabla Historial_Academico: togglear el
+// checkbox crea/actualiza/borra un registro de historial vía la API
+// (requiere haber iniciado sesión).
 
 (function () {
     "use strict";
 
-    const STORAGE_KEY = "planEstudios:v1";
+    let COURSES = [];
+    // materia_id -> registro de historial (el más reciente por materia)
+    let historialPorMateria = new Map();
 
     const CATEGORY_TO_COLOR = {
         "fisica-matematica": "danger",
@@ -28,38 +27,83 @@
         ing: "Ciclo de Ingeniería",
     };
 
-    // --- Persistencia -------------------------------------------------
+    // --- Datos desde el backend -----------------------------------------
 
-    function loadApprovedState() {
-        try {
-            const raw = localStorage.getItem(STORAGE_KEY);
-            return raw ? JSON.parse(raw) : {};
-        } catch (err) {
-            console.warn("No se pudo leer el estado guardado:", err);
-            return {};
-        }
+    async function loadPlanFromBackend() {
+        const [ciclos, historial] = await Promise.all([getPlanEstudios(), getHistorial()]);
+
+        historialPorMateria = new Map();
+        historial.forEach((registro) => {
+            // Si hay varios registros para la misma materia (reintentos),
+            // nos quedamos con el más reciente.
+            const actual = historialPorMateria.get(registro.materia_id);
+            if (!actual || new Date(registro.fecha_registro) > new Date(actual.fecha_registro)) {
+                historialPorMateria.set(registro.materia_id, registro);
+            }
+        });
+
+        const courses = [];
+        ciclos.forEach((ciclo) => {
+            ciclo.semestres.forEach((semestre) => {
+                semestre.materias.forEach((materia) => {
+                    courses.push({
+                        id: materia.id,
+                        name: materia.nombre,
+                        code: materia.codigo,
+                        credits: materia.creditos,
+                        cycle: ciclo.id,
+                        semester: semestre.numero,
+                        category: materia.categoria,
+                        type: materia.tipo,
+                        prereq: materia.prereq,
+                    });
+                });
+            });
+        });
+        return courses;
     }
 
-    function saveApprovedState(state) {
-        try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-        } catch (err) {
-            console.warn("No se pudo guardar el estado:", err);
-        }
+    function isApproved(course) {
+        const registro = historialPorMateria.get(course.id);
+        return !!registro && registro.estado === "Aprobada";
     }
 
-    function isApproved(course, savedState) {
-        // El estado guardado en el navegador tiene prioridad sobre el
-        // valor por defecto que trae courses-data.js.
-        if (Object.prototype.hasOwnProperty.call(savedState, course.id)) {
-            return !!savedState[course.id];
+    async function setApproved(course, approved) {
+        const registro = historialPorMateria.get(course.id);
+
+        if (approved) {
+            if (registro) {
+                const actualizado = await actualizarHistorial(registro.id, {
+                    materia_id: course.id,
+                    periodo: registro.periodo,
+                    nota_final: registro.nota_final,
+                    estado: "Aprobada",
+                });
+                historialPorMateria.set(course.id, actualizado);
+            } else {
+                const creado = await crearHistorial(course.id, {
+                    periodo: null,
+                    nota_final: null,
+                    estado: "Aprobada",
+                });
+                historialPorMateria.set(course.id, creado);
+            }
+            return;
         }
-        return !!course.approved;
+
+        // Desmarcar: solo se puede si el registro no tiene una nota real
+        // asociada (fue creado únicamente por el checkbox).
+        if (registro && registro.nota_final === null) {
+            await eliminarHistorial(registro.id);
+            historialPorMateria.delete(course.id);
+        } else if (registro) {
+            throw new Error("Esta materia tiene una nota registrada; no se puede desmarcar desde aquí.");
+        }
     }
 
     // --- Prerrequisitos --------------------------------------------------
-    // Se leen del campo "prereq" (arreglo de ids) de cada curso en
-    // courses-data.js. Para agregar uno: prereq: ["tec-1", "tec-9"]
+    // Se leen del campo "prereq" (arreglo de ids) de cada materia, que viene
+    // del prereq_json de la tabla Materia en el backend.
 
     let courseById = null;
 
@@ -91,7 +135,7 @@
                 .map((prereqId) => {
                     const prereqCourse = getCourseById(prereqId);
                     if (!prereqCourse) {
-                        return `<li class="text-warning">${prereqId} (no encontrado en courses-data.js)</li>`;
+                        return `<li class="text-warning">${prereqId} (no encontrado en el plan de estudios)</li>`;
                     }
                     const prereqCard = document.getElementById(prereqCourse.id);
                     const checkbox = prereqCard ? prereqCard.querySelector(".course-check") : null;
@@ -146,9 +190,9 @@
 
     // --- Construcción de tarjetas --------------------------------------
 
-    function buildCourseCard(course, savedState) {
+    function buildCourseCard(course) {
         const color = CATEGORY_TO_COLOR[course.category] || "light";
-        const approved = isApproved(course, savedState);
+        const approved = isApproved(course);
 
         const card = document.createElement("div");
         card.className = `card course-card border-${color} text-${color} mb-3`;
@@ -195,7 +239,7 @@
         return card;
     }
 
-    function buildSemesterColumn(cycle, semesterNum, courses, savedState) {
+    function buildSemesterColumn(cycle, semesterNum, courses) {
         const col = document.createElement("div");
         col.className = "col-12 col-md-6 col-lg-2";
 
@@ -210,7 +254,7 @@
         let semTotal = 0;
         courses.forEach((course, idx) => {
             semTotal += course.credits;
-            const cardEl = buildCourseCard(course, savedState);
+            const cardEl = buildCourseCard(course);
             if (idx === 0) cardEl.classList.add("mt-3");
             semCard.appendChild(cardEl);
         });
@@ -228,7 +272,6 @@
         const container = document.getElementById(containerId);
         if (!container) return;
 
-        const savedState = loadApprovedState();
         const courses = COURSES.filter((c) => c.cycle === cycleKey);
 
         const semesters = {};
@@ -243,7 +286,7 @@
             .sort((a, b) => a - b)
             .forEach((semNum) => {
                 container.appendChild(
-                    buildSemesterColumn(cycleKey, semNum, semesters[semNum], savedState)
+                    buildSemesterColumn(cycleKey, semNum, semesters[semNum])
                 );
             });
 
@@ -319,14 +362,29 @@
 
     function attachCheckboxListeners() {
         document.querySelectorAll(".course-check").forEach((checkbox) => {
-            checkbox.addEventListener("change", () => {
+            checkbox.addEventListener("change", async () => {
                 const card = checkbox.closest(".course-card");
-                if (card) {
-                    const state = loadApprovedState();
-                    state[card.id] = checkbox.checked;
-                    saveApprovedState(state);
+                const course = card ? getCourseById(card.id) : null;
+                if (!course) return;
+
+                if (!isLoggedIn()) {
+                    checkbox.checked = !checkbox.checked;
+                    alert("Debes iniciar sesión para guardar cambios en el plan de estudios.");
+                    window.location.href = "/index.html";
+                    return;
                 }
-                updateDashboard();
+
+                const nuevoEstado = checkbox.checked;
+                checkbox.disabled = true;
+                try {
+                    await setApproved(course, nuevoEstado);
+                } catch (err) {
+                    checkbox.checked = !nuevoEstado;
+                    alert(err.message);
+                } finally {
+                    checkbox.disabled = false;
+                    updateDashboard();
+                }
             });
         });
     }
@@ -362,11 +420,19 @@
         });
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-        if (typeof COURSES === "undefined") {
-            console.error("courses-data.js no se cargó antes que planEstudios.js");
+    document.addEventListener("DOMContentLoaded", async () => {
+        try {
+            COURSES = await loadPlanFromBackend();
+            courseById = null; // se reconstruye con los datos frescos
+        } catch (err) {
+            console.error("No se pudo cargar el plan de estudios desde el backend:", err);
+            const container = document.getElementById("tec-semesters");
+            if (container) {
+                container.innerHTML = `<p class="text-danger">No se pudo conectar con el backend (${err.message}). Verifica que el servidor esté corriendo.</p>`;
+            }
             return;
         }
+
         renderPlan();
         attachCheckboxListeners();
         attachPdfButton();
