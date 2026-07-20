@@ -60,6 +60,45 @@
 
     <div id="footer-container"></div>
 
+    <!-- Modal de registro/edición de nota -->
+    <div class="modal fade" id="notaModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="notaForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="notaModalLabel">Registrar nota</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="mb-3" id="notaModalMateria"></p>
+                        <div class="mb-3">
+                            <label for="notaEstado" class="form-label">Estado</label>
+                            <select class="form-select" id="notaEstado" required>
+                                <option value="En curso">En curso</option>
+                                <option value="Aprobada">Aprobada</option>
+                                <option value="Reprobada">Reprobada</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="notaFinal" class="form-label">Nota final (0.0 - 5.0)</label>
+                            <input type="number" class="form-control" id="notaFinal" min="0" max="5" step="0.1">
+                        </div>
+                        <div class="mb-3">
+                            <label for="notaPeriodo" class="form-label">Periodo</label>
+                            <input type="text" class="form-control" id="notaPeriodo" placeholder="Ej: 2026-1">
+                        </div>
+                        <div class="alert alert-danger d-none" id="notaError"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-danger me-auto d-none" id="notaDeleteBtn">Eliminar registro</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-info" id="notaSaveBtn">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/api/api.js"></script>
@@ -67,76 +106,88 @@
 
     <!-- Lógica de Generación de la Tabla -->
     <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            const tableBody = document.getElementById('notas-tbody');
+        (function () {
+            "use strict";
 
-            let ciclos, historial;
-            try {
-                [ciclos, historial] = await Promise.all([getPlanEstudios(), getHistorial()]);
-            } catch (err) {
-                tableBody.innerHTML = `<tr><td colspan="8" class="text-danger">Error al conectar con el backend: ${err.message}</td></tr>`;
-                return;
-            }
+            let materiasPorId = new Map();
+            let historialPorMateria = new Map();
+            let notaModal = null;
+            let materiaSeleccionada = null;
+            let ciclosCache = null;
 
-            // Une materias con su registro de historial más reciente (si existe)
-            const historialPorMateria = new Map();
-            historial.forEach((registro) => {
-                const actual = historialPorMateria.get(registro.materia_id);
-                if (!actual || new Date(registro.fecha_registro) > new Date(actual.fecha_registro)) {
-                    historialPorMateria.set(registro.materia_id, registro);
-                }
-            });
+            async function cargarDatos() {
+                const [ciclos, historial] = await Promise.all([getPlanEstudios(), getHistorial()]);
 
-            // 1. Agrupar las materias por nivel (semestre)
-            const niveles = {};
-            ciclos.forEach((ciclo) => {
-                ciclo.semestres.forEach((semestre) => {
-                    semestre.materias.forEach((materia) => {
-                        if (!niveles[semestre.numero]) niveles[semestre.numero] = [];
-                        niveles[semestre.numero].push(materia);
+                materiasPorId = new Map();
+                ciclos.forEach((ciclo) => {
+                    ciclo.semestres.forEach((semestre) => {
+                        semestre.materias.forEach((materia) => {
+                            materiasPorId.set(materia.id, { ...materia, nivel: semestre.numero });
+                        });
                     });
                 });
-            });
 
-            // 2. Ordenar los niveles y generar el HTML
-            const nivelesOrdenados = Object.keys(niveles).sort((a, b) => Number(a) - Number(b));
+                historialPorMateria = new Map();
+                historial.forEach((registro) => {
+                    const actual = historialPorMateria.get(registro.materia_id);
+                    if (!actual || new Date(registro.fecha_registro) > new Date(actual.fecha_registro)) {
+                        historialPorMateria.set(registro.materia_id, registro);
+                    }
+                });
 
-            nivelesOrdenados.forEach(nivel => {
-                // Generar el encabezado del Nivel
-                tableBody.innerHTML += `
-                    <tr>
-                        <td colspan="8" class="nivel-header text-center py-2">NIVEL: ${nivel}</td>
-                    </tr>
-                    <tr class="table-secondary">
-                        <th style="width: 10%;">Asignatura</th>
-                        <th class="text-start" style="width: 30%;">Nombre</th>
-                        <th style="width: 10%;">Nota</th>
-                        <th style="width: 10%;">Créditos</th>
-                        <th style="width: 10%;">Clasificación</th>
-                        <th style="width: 10%;">Estado</th>
-                        <th style="width: 10%;">Periodo</th>
-                        <th style="width: 10%;">Registrado</th>
-                    </tr>
-                `;
+                ciclosCache = ciclos;
+                return ciclos;
+            }
 
-                // Generar las filas de cada materia en este nivel
-                niveles[nivel].forEach(materia => {
-                    const registro = historialPorMateria.get(materia.id);
+            function renderTabla(ciclos) {
+                const tableBody = document.getElementById('notas-tbody');
+                tableBody.innerHTML = "";
 
-                    const notaMostrar = registro && registro.nota_final !== null
-                        ? registro.nota_final
-                        : '<span class="text-muted">-</span>';
-                    const estadoMostrar = registro ? registro.estado : '<span class="text-muted">Pendiente</span>';
-                    const periodoMostrar = registro && registro.periodo ? registro.periodo : '-';
-                    const fechaMostrar = registro
-                        ? new Date(registro.fecha_registro).toLocaleDateString()
-                        : '';
+                const niveles = {};
+                ciclos.forEach((ciclo) => {
+                    ciclo.semestres.forEach((semestre) => {
+                        semestre.materias.forEach((materia) => {
+                            if (!niveles[semestre.numero]) niveles[semestre.numero] = [];
+                            niveles[semestre.numero].push(materia);
+                        });
+                    });
+                });
 
-                    // Manejo visual de códigos vacíos
-                    const codigo = (materia.codigo && materia.codigo !== "-") ? materia.codigo : "";
+                const nivelesOrdenados = Object.keys(niveles).sort((a, b) => Number(a) - Number(b));
 
+                nivelesOrdenados.forEach(nivel => {
                     tableBody.innerHTML += `
                         <tr>
+                            <td colspan="9" class="nivel-header text-center py-2">NIVEL: ${nivel}</td>
+                        </tr>
+                        <tr class="table-secondary">
+                            <th style="width: 8%;">Asignatura</th>
+                            <th class="text-start" style="width: 27%;">Nombre</th>
+                            <th style="width: 8%;">Nota</th>
+                            <th style="width: 8%;">Créditos</th>
+                            <th style="width: 8%;">Clasificación</th>
+                            <th style="width: 10%;">Estado</th>
+                            <th style="width: 8%;">Periodo</th>
+                            <th style="width: 10%;">Registrado</th>
+                            <th style="width: 8%;">Acción</th>
+                        </tr>
+                    `;
+
+                    niveles[nivel].forEach(materia => {
+                        const registro = historialPorMateria.get(materia.id);
+
+                        const notaMostrar = registro && registro.nota_final !== null
+                            ? registro.nota_final
+                            : '<span class="text-muted">-</span>';
+                        const estadoMostrar = registro ? registro.estado : '<span class="text-muted">Pendiente</span>';
+                        const periodoMostrar = registro && registro.periodo ? registro.periodo : '-';
+                        const fechaMostrar = registro
+                            ? new Date(registro.fecha_registro).toLocaleDateString()
+                            : '';
+                        const codigo = (materia.codigo && materia.codigo !== "-") ? materia.codigo : "";
+
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
                             <td>${codigo}</td>
                             <td class="text-start fw-bold">${materia.nombre}</td>
                             <td class="text-info fw-bold">${notaMostrar}</td>
@@ -145,11 +196,109 @@
                             <td>${estadoMostrar}</td>
                             <td>${periodoMostrar}</td>
                             <td class="small">${fechaMostrar}</td>
-                        </tr>
-                    `;
+                            <td>
+                                <button type="button" class="btn btn-outline-info btn-sm btn-editar-nota" data-materia-id="${materia.id}">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
                 });
+            }
+
+            function abrirModal(materiaId) {
+                if (!isLoggedIn()) {
+                    alert("Debes iniciar sesión para registrar notas.");
+                    window.location.href = "/index.html";
+                    return;
+                }
+
+                materiaSeleccionada = materiaId;
+                const materia = materiasPorId.get(materiaId);
+                const registro = historialPorMateria.get(materiaId);
+
+                document.getElementById('notaModalMateria').textContent = `${materia.nombre} (${materia.codigo !== "-" ? materia.codigo : "sin código"})`;
+                document.getElementById('notaEstado').value = registro ? registro.estado : "En curso";
+                document.getElementById('notaFinal').value = registro && registro.nota_final !== null ? registro.nota_final : "";
+                document.getElementById('notaPeriodo').value = registro && registro.periodo ? registro.periodo : "";
+                document.getElementById('notaError').classList.add('d-none');
+                document.getElementById('notaDeleteBtn').classList.toggle('d-none', !registro);
+
+                notaModal.show();
+            }
+
+            async function guardarNota(event) {
+                event.preventDefault();
+                const errorBox = document.getElementById('notaError');
+                errorBox.classList.add('d-none');
+
+                const estado = document.getElementById('notaEstado').value;
+                const notaValor = document.getElementById('notaFinal').value;
+                const nota_final = notaValor === "" ? null : parseFloat(notaValor);
+                const periodo = document.getElementById('notaPeriodo').value.trim() || null;
+
+                const saveBtn = document.getElementById('notaSaveBtn');
+                saveBtn.disabled = true;
+                try {
+                    const registro = historialPorMateria.get(materiaSeleccionada);
+                    let actualizado;
+                    if (registro) {
+                        actualizado = await actualizarHistorial(registro.id, { materia_id: materiaSeleccionada, estado, nota_final, periodo });
+                    } else {
+                        actualizado = await crearHistorial(materiaSeleccionada, { estado, nota_final, periodo });
+                    }
+                    historialPorMateria.set(materiaSeleccionada, actualizado);
+                    renderTabla(ciclosCache);
+                    notaModal.hide();
+                } catch (err) {
+                    errorBox.textContent = err.message;
+                    errorBox.classList.remove('d-none');
+                } finally {
+                    saveBtn.disabled = false;
+                }
+            }
+
+            async function eliminarNota() {
+                const registro = historialPorMateria.get(materiaSeleccionada);
+                if (!registro) return;
+                if (!confirm("¿Eliminar este registro de historial?")) return;
+
+                try {
+                    await eliminarHistorial(registro.id);
+                    historialPorMateria.delete(materiaSeleccionada);
+                    renderTabla(ciclosCache);
+                    notaModal.hide();
+                } catch (err) {
+                    const errorBox = document.getElementById('notaError');
+                    errorBox.textContent = err.message;
+                    errorBox.classList.remove('d-none');
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', async () => {
+                const tableBody = document.getElementById('notas-tbody');
+                notaModal = new bootstrap.Modal(document.getElementById('notaModal'));
+
+                let ciclos;
+                try {
+                    ciclos = await cargarDatos();
+                } catch (err) {
+                    tableBody.innerHTML = `<tr><td colspan="9" class="text-danger">Error al conectar con el backend: ${err.message}</td></tr>`;
+                    return;
+                }
+
+                renderTabla(ciclos);
+
+                tableBody.addEventListener('click', (event) => {
+                    const btn = event.target.closest('.btn-editar-nota');
+                    if (btn) abrirModal(btn.dataset.materiaId);
+                });
+
+                document.getElementById('notaForm').addEventListener('submit', guardarNota);
+                document.getElementById('notaDeleteBtn').addEventListener('click', eliminarNota);
             });
-        });
+        })();
     </script>
 </body>
 </html>

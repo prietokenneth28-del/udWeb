@@ -20,7 +20,13 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     """Upgrade schema."""
-    op.drop_table("course")
+    op.create_table(
+        "user",
+        sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
+        sa.Column("username", sa.String(), nullable=False),
+        sa.Column("hashed_password", sa.String(), nullable=False),
+    )
+    op.create_index(op.f("ix_user_username"), "user", ["username"], unique=True)
 
     op.create_table(
         "ciclo_academico",
@@ -64,17 +70,5 @@ def downgrade() -> None:
     op.drop_table("materia")
     op.drop_table("semestre")
     op.drop_table("ciclo_academico")
-
-    op.create_table(
-        "course",
-        sa.Column("id", sa.String(), primary_key=True),
-        sa.Column("name", sa.String(), nullable=False),
-        sa.Column("code", sa.String(), nullable=False),
-        sa.Column("credits", sa.Float(), nullable=False),
-        sa.Column("cycle", sa.String(), nullable=False),
-        sa.Column("semester", sa.Integer(), nullable=False),
-        sa.Column("category", sa.String(), nullable=False),
-        sa.Column("type", sa.String(), nullable=False),
-        sa.Column("approved", sa.Boolean(), nullable=False, server_default=sa.false()),
-        sa.Column("prereq_json", sa.String(), nullable=False, server_default="[]"),
-    )
+    op.drop_index(op.f("ix_user_username"), table_name="user")
+    op.drop_table("user")
