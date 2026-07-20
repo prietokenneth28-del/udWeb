@@ -6,5 +6,5 @@
             "packageManager": "ms-python.python:pip"
         }
     ],
-    "liveServer.settings.root": "/frontend/src"
+    "liveServer.settings.root": "/frontend/src/"
 }

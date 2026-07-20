@@ -1,7 +1,7 @@
 // api.js — toda la comunicación con el backend vive aquí.
 // planEstudios.js llama a estas funciones, no hace fetch() directo.
 
-const API_BASE_URL = "http://127.0.0.1:8000";
+const API_BASE_URL = "https://udweb-d5s8.onrender.com";
 
 // El login vive en una página aparte (index.html) y el resto de páginas
 // (pages/*.html) se navegan con recargas completas, así que el token no
