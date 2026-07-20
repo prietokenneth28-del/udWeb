@@ -184,7 +184,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             return;
         }
 
-        const materiasHoy = tbody.querySelectorAll(`td[data-dia="${diaActualJS}"]`);
+        const materiasHoy = tbody.querySelectorAll(`td[data-dia="${diaActualJS}"][data-clase-id]`);
 
         if (materiasHoy.length === 0) {
             contenedorHoy.innerHTML = '<p class="text-muted mb-0">No tienes clases programadas para hoy en este semestre.</p>';
