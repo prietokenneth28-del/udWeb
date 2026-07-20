@@ -47,6 +47,41 @@ class HistorialAcademico(SQLModel, table=True):
     fecha_registro: datetime = Field(default_factory=datetime.utcnow)
 
 
+class SemestreHorario(SQLModel, table=True):
+    __tablename__ = "semestre_horario"
+
+    numero: int = Field(primary_key=True)
+    label: str
+
+
+class ClaseHorario(SQLModel, table=True):
+    __tablename__ = "clase_horario"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    semestre_numero: int = Field(foreign_key="semestre_horario.numero")
+    dia: int = Field(ge=1, le=6)  # 1=Lunes .. 6=Sábado
+    hora_inicio: int
+    hora_fin: int
+    materia: str
+    color: str = "bg-primary"
+    aula: Optional[str] = None
+
+
+class ClaseHorarioCreate(SQLModel):
+    semestre_numero: int
+    dia: int = Field(ge=1, le=6)
+    hora_inicio: int
+    hora_fin: int
+    materia: str
+    color: str = "bg-primary"
+    aula: Optional[str] = None
+
+
+class SemestreHorarioCreate(SQLModel):
+    numero: int
+    label: str
+
+
 class User(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     username: str = Field(unique=True, index=True)

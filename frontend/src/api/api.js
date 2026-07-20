@@ -98,3 +98,55 @@ async function eliminarHistorial(historialId) {
     });
     if (!res.ok) throw new Error("No se pudo eliminar el historial");
 }
+
+async function getHorario() {
+    const res = await fetch(`${API_BASE_URL}/api/horario`, { headers: authHeaders() });
+    if (!res.ok) throw new Error("No se pudo cargar el horario");
+    return res.json();
+}
+
+async function crearSemestreHorario(numero, label) {
+    const res = await fetch(`${API_BASE_URL}/api/horario/semestres`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...authHeaders() },
+        body: JSON.stringify({ numero, label }),
+    });
+    if (!res.ok) throw new Error("No se pudo crear el semestre");
+    return res.json();
+}
+
+async function eliminarSemestreHorario(numero) {
+    const res = await fetch(`${API_BASE_URL}/api/horario/semestres/${numero}`, {
+        method: "DELETE",
+        headers: authHeaders(),
+    });
+    if (!res.ok) throw new Error("No se pudo eliminar el semestre");
+}
+
+async function crearClaseHorario(datos) {
+    const res = await fetch(`${API_BASE_URL}/api/horario/clases`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...authHeaders() },
+        body: JSON.stringify(datos),
+    });
+    if (!res.ok) throw new Error("No se pudo crear la clase");
+    return res.json();
+}
+
+async function actualizarClaseHorario(claseId, datos) {
+    const res = await fetch(`${API_BASE_URL}/api/horario/clases/${claseId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", ...authHeaders() },
+        body: JSON.stringify(datos),
+    });
+    if (!res.ok) throw new Error("No se pudo actualizar la clase");
+    return res.json();
+}
+
+async function eliminarClaseHorario(claseId) {
+    const res = await fetch(`${API_BASE_URL}/api/horario/clases/${claseId}`, {
+        method: "DELETE",
+        headers: authHeaders(),
+    });
+    if (!res.ok) throw new Error("No se pudo eliminar la clase");
+}

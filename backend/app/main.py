@@ -2,7 +2,17 @@ from datetime import datetime
 
 from fastapi import FastAPI, HTTPException, Depends
 from sqlmodel import Session, select
-from app.models import CicloAcademico, Semestre, Materia, HistorialAcademico, User
+from app.models import (
+    CicloAcademico,
+    Semestre,
+    Materia,
+    HistorialAcademico,
+    User,
+    SemestreHorario,
+    SemestreHorarioCreate,
+    ClaseHorario,
+    ClaseHorarioCreate,
+)
 from app.database import get_session
 from app.auth import router as auth_router, get_current_user
 
@@ -127,6 +137,123 @@ def eliminar_historial(
     if not registro:
         raise HTTPException(status_code=404, detail="Registro de historial no encontrado")
     session.delete(registro)
+    session.commit()
+
+
+def _clase_dict(clase: ClaseHorario) -> dict:
+    return {
+        "id": clase.id,
+        "dia": clase.dia,
+        "horaInicio": clase.hora_inicio,
+        "horaFin": clase.hora_fin,
+        "materia": clase.materia,
+        "color": clase.color,
+        "aula": clase.aula,
+    }
+
+
+@app.get("/api/horario")
+def obtener_horario(
+    session: Session = Depends(get_session),
+    usuario_actual: User = Depends(get_current_user),
+):
+    semestres = session.exec(select(SemestreHorario)).all()
+    clases = session.exec(select(ClaseHorario)).all()
+
+    clases_por_semestre: dict[int, list] = {}
+    for clase in clases:
+        clases_por_semestre.setdefault(clase.semestre_numero, []).append(clase)
+
+    return {
+        "semesters": {
+            str(semestre.numero): {
+                "label": semestre.label,
+                "classes": [_clase_dict(c) for c in clases_por_semestre.get(semestre.numero, [])],
+            }
+            for semestre in semestres
+        }
+    }
+
+
+@app.post("/api/horario/semestres", status_code=201)
+def crear_semestre_horario(
+    datos: SemestreHorarioCreate,
+    session: Session = Depends(get_session),
+    usuario_actual: User = Depends(get_current_user),
+):
+    if session.get(SemestreHorario, datos.numero):
+        raise HTTPException(status_code=400, detail="Ese semestre ya existe")
+    semestre = SemestreHorario(numero=datos.numero, label=datos.label)
+    session.add(semestre)
+    session.commit()
+    session.refresh(semestre)
+    return semestre
+
+
+@app.delete("/api/horario/semestres/{numero}", status_code=204)
+def eliminar_semestre_horario(
+    numero: int,
+    session: Session = Depends(get_session),
+    usuario_actual: User = Depends(get_current_user),
+):
+    semestre = session.get(SemestreHorario, numero)
+    if not semestre:
+        raise HTTPException(status_code=404, detail="Semestre no encontrado")
+
+    clases = session.exec(select(ClaseHorario).where(ClaseHorario.semestre_numero == numero)).all()
+    for clase in clases:
+        session.delete(clase)
+    session.delete(semestre)
+    session.commit()
+
+
+@app.post("/api/horario/clases", status_code=201)
+def crear_clase_horario(
+    datos: ClaseHorarioCreate,
+    session: Session = Depends(get_session),
+    usuario_actual: User = Depends(get_current_user),
+):
+    if not session.get(SemestreHorario, datos.semestre_numero):
+        raise HTTPException(status_code=404, detail="El semestre no existe")
+
+    clase = ClaseHorario(**datos.model_dump())
+    session.add(clase)
+    session.commit()
+    session.refresh(clase)
+    return _clase_dict(clase)
+
+
+@app.put("/api/horario/clases/{clase_id}")
+def actualizar_clase_horario(
+    clase_id: int,
+    datos: ClaseHorarioCreate,
+    session: Session = Depends(get_session),
+    usuario_actual: User = Depends(get_current_user),
+):
+    clase = session.get(ClaseHorario, clase_id)
+    if not clase:
+        raise HTTPException(status_code=404, detail="Clase no encontrada")
+    if not session.get(SemestreHorario, datos.semestre_numero):
+        raise HTTPException(status_code=404, detail="El semestre no existe")
+
+    for clave, valor in datos.model_dump().items():
+        setattr(clase, clave, valor)
+    session.add(clase)
+    session.commit()
+    session.refresh(clase)
+    return _clase_dict(clase)
+
+
+@app.delete("/api/horario/clases/{clase_id}", status_code=204)
+def eliminar_clase_horario(
+    clase_id: int,
+    session: Session = Depends(get_session),
+    usuario_actual: User = Depends(get_current_user),
+):
+    clase = session.get(ClaseHorario, clase_id)
+    if not clase:
+        raise HTTPException(status_code=404, detail="Clase no encontrada")
+    session.delete(clase)
     session.commit()
 
 

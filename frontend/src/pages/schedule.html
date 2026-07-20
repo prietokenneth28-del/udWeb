@@ -12,7 +12,10 @@
     <style>
         .table-horario th { background-color: #2b3035; vertical-align: middle; }
         .table-horario td { height: 60px; vertical-align: middle; }
-        .materia-slot { padding: 5px; border-radius: 5px; font-weight: bold; font-size: 0.9em; }
+        .materia-slot { padding: 5px; border-radius: 5px; font-weight: bold; font-size: 0.9em; cursor: pointer; }
+        .materia-slot:hover { filter: brightness(1.15); }
+        .celda-vacia { cursor: pointer; min-height: 100%; display: block; }
+        .celda-vacia:hover { background-color: rgba(255, 255, 255, 0.05); }
         /* Ocultar todos los tbody por defecto, excepto el activo */
         tbody.horario-tbody { display: none; }
         tbody.horario-tbody.active { display: table-row-group; }
@@ -25,17 +28,28 @@
     <div class="container-fluid mt-4">
         <main>
             <div class="card text-center">
-                <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
                     <h3 class="mb-0">Horario de Clases</h3>
-                    
-                    <!-- SELECT PARA ELEGIR EL SEMESTRE -->
-                    <select id="semestreSelect" class="form-select w-auto" aria-label="Seleccionar Semestre">
-                        <!-- Las opciones se generan dinámicamente desde schedule-data.js -->
-                    </select>
+
+                    <div class="d-flex align-items-center gap-2">
+                        <!-- SELECT PARA ELEGIR EL SEMESTRE -->
+                        <select id="semestreSelect" class="form-select w-auto" aria-label="Seleccionar Semestre">
+                            <!-- Las opciones se generan dinámicamente desde el backend -->
+                        </select>
+                        <button type="button" class="btn btn-outline-info btn-sm" id="btnAgregarSemestre" title="Agregar semestre">
+                            <i class="bi bi-plus-lg"></i> Semestre
+                        </button>
+                        <button type="button" class="btn btn-outline-danger btn-sm" id="btnEliminarSemestre" title="Eliminar semestre actual">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                        <button type="button" class="btn btn-info btn-sm" id="btnAgregarClase" title="Agregar clase">
+                            <i class="bi bi-plus-lg"></i> Clase
+                        </button>
+                    </div>
                 </div>
-                
+
                 <div class="card-body">
-                    
+
                     <!-- MENSAJE DE HORARIO VACÍO (Oculto por defecto) -->
                     <div id="noScheduleMessage" class="alert alert-warning" style="display: none;" role="alert">
                         No se ha registrado horario para este periodo académico.
@@ -66,7 +80,7 @@
                                 </tr>
                             </thead>
                             <!-- Los <tbody> de cada semestre se generan dinámicamente
-                                 desde schedule-data.js por main.shedule.js -->
+                                 a partir de lo que devuelve el backend, por main.shedule.js -->
                         </table>
                     </div>
 
@@ -77,10 +91,100 @@
 
     <div id="footer-container"></div>
 
+    <!-- Modal de clase (crear / editar) -->
+    <div class="modal fade" id="claseModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="claseForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="claseModalLabel">Agregar clase</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="claseMateria" class="form-label">Materia</label>
+                            <input type="text" class="form-control" id="claseMateria" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label for="claseDia" class="form-label">Día</label>
+                                <select class="form-select" id="claseDia" required>
+                                    <option value="1">Lunes</option>
+                                    <option value="2">Martes</option>
+                                    <option value="3">Miércoles</option>
+                                    <option value="4">Jueves</option>
+                                    <option value="5">Viernes</option>
+                                    <option value="6">Sábado</option>
+                                </select>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label for="claseColor" class="form-label">Color</label>
+                                <select class="form-select" id="claseColor">
+                                    <option value="bg-primary">Azul</option>
+                                    <option value="bg-success">Verde</option>
+                                    <option value="bg-danger">Rojo</option>
+                                    <option value="bg-warning">Amarillo</option>
+                                    <option value="bg-info">Cian</option>
+                                    <option value="bg-secondary">Gris</option>
+                                </select>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label for="claseHoraInicio" class="form-label">Hora inicio</label>
+                                <input type="number" class="form-control" id="claseHoraInicio" min="0" max="23" required>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label for="claseHoraFin" class="form-label">Hora fin</label>
+                                <input type="number" class="form-control" id="claseHoraFin" min="1" max="24" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="claseAula" class="form-label">Aula (opcional)</label>
+                            <input type="text" class="form-control" id="claseAula" placeholder="Ej: Bloque A - 201">
+                        </div>
+                        <div class="alert alert-danger d-none" id="claseError"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-danger me-auto d-none" id="claseDeleteBtn">Eliminar clase</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-info" id="claseSaveBtn">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de semestre (crear) -->
+    <div class="modal fade" id="semestreModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="semestreForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Agregar semestre</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="semestreNumero" class="form-label">Número</label>
+                            <input type="number" class="form-control" id="semestreNumero" min="1" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="semestreLabel" class="form-label">Etiqueta</label>
+                            <input type="text" class="form-control" id="semestreLabel" placeholder="Ej: Semestre 8 (2027-1)" required>
+                        </div>
+                        <div class="alert alert-danger d-none" id="semestreError"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-info">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/api/api.js"></script>
     <script src="/services/js/components.js"></script>
-    <script src="/services/js/schedule-data.js"></script>
     <script src="/services/js/main.shedule.js"></script>
 </body>
 </html>
