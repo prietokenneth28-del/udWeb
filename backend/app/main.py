@@ -14,6 +14,7 @@ origenes_permitidos = [
     "http://127.0.0.1:5500",
     "http://localhost:5500",
     "https://prietokenneth28-del.github.io",
+    "https://udweb-1-zkip.onrender.com",
 ]
 
 app.add_middleware(
