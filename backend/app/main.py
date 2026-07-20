@@ -1,6 +1,7 @@
+import os
 from datetime import datetime
 
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, Header
 from sqlmodel import Session, select
 from app.models import (
     CicloAcademico,
@@ -15,6 +16,7 @@ from app.models import (
 )
 from app.database import get_session
 from app.auth import router as auth_router, get_current_user
+from app.telegram_bot import construir_mensaje_horario_hoy, enviar_mensaje_telegram
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -255,6 +257,21 @@ def eliminar_clase_horario(
         raise HTTPException(status_code=404, detail="Clase no encontrada")
     session.delete(clase)
     session.commit()
+
+
+@app.post("/api/horario/notificar-hoy")
+def notificar_horario_hoy(
+    x_bot_secret: str | None = Header(default=None),
+    session: Session = Depends(get_session),
+):
+    secreto_esperado = os.getenv("TELEGRAM_NOTIFY_SECRET")
+    if not secreto_esperado or x_bot_secret != secreto_esperado:
+        raise HTTPException(status_code=403, detail="Secreto inválido")
+
+    dia_hoy = datetime.now().isoweekday()  # 1=Lunes .. 7=Domingo
+    mensaje = construir_mensaje_horario_hoy(session, dia_hoy)
+    enviar_mensaje_telegram(mensaje)
+    return {"status": "enviado", "mensaje": mensaje}
 
 
 @app.get("/api/estadisticas")

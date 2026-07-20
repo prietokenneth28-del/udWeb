@@ -1,0 +1,15 @@
+name: Notificar horario diario por Telegram
+
+on:
+  schedule:
+    - cron: "0 11 * * *" # 06:00 America/Bogota (UTC-5)
+  workflow_dispatch: {}
+
+jobs:
+  notificar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Llamar endpoint de notificación
+        run: |
+          curl -sf -X POST "${{ secrets.BACKEND_URL }}/api/horario/notificar-hoy" \
+            -H "X-Bot-Secret: ${{ secrets.TELEGRAM_NOTIFY_SECRET }}"
