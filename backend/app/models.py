@@ -42,7 +42,7 @@ class HistorialAcademico(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     materia_id: str = Field(foreign_key="materia.id")
     periodo: Optional[str] = None
-    nota_final: Optional[float] = None
+    nota_final: Optional[float] = Field(default=None, ge=0, le=5)
     estado: str  # "Aprobada", "Reprobada", "En curso"
     fecha_registro: datetime = Field(default_factory=datetime.utcnow)
 
@@ -56,3 +56,4 @@ class User(SQLModel, table=True):
 class UserCreate(SQLModel):
     username: str
     password: str
+    register_secret: str

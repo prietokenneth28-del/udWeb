@@ -60,13 +60,13 @@ async function getPlanEstudios() {
 }
 
 async function getHistorial() {
-    const res = await fetch(`${API_BASE_URL}/api/historial`);
+    const res = await fetch(`${API_BASE_URL}/api/historial`, { headers: authHeaders() });
     if (!res.ok) throw new Error("No se pudo cargar el historial académico");
     return res.json();
 }
 
 async function getEstadisticas() {
-    const res = await fetch(`${API_BASE_URL}/api/estadisticas`);
+    const res = await fetch(`${API_BASE_URL}/api/estadisticas`, { headers: authHeaders() });
     if (!res.ok) throw new Error("No se pudo cargar las estadísticas");
     return res.json();
 }

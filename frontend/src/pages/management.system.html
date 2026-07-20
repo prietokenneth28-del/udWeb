@@ -277,6 +277,11 @@
             }
 
             document.addEventListener('DOMContentLoaded', async () => {
+                if (!isLoggedIn()) {
+                    window.location.href = "/index.html";
+                    return;
+                }
+
                 const tableBody = document.getElementById('notas-tbody');
                 notaModal = new bootstrap.Modal(document.getElementById('notaModal'));
 

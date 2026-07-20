@@ -72,7 +72,10 @@ def obtener_plan_estudios(session: Session = Depends(get_session)):
 
 
 @app.get("/api/historial", response_model=list[HistorialAcademico])
-def obtener_historial(session: Session = Depends(get_session)):
+def obtener_historial(
+    session: Session = Depends(get_session),
+    usuario_actual: User = Depends(get_current_user),
+):
     return session.exec(select(HistorialAcademico)).all()
 
 
@@ -128,7 +131,10 @@ def eliminar_historial(
 
 
 @app.get("/api/estadisticas")
-def obtener_estadisticas(session: Session = Depends(get_session)):
+def obtener_estadisticas(
+    session: Session = Depends(get_session),
+    usuario_actual: User = Depends(get_current_user),
+):
     materias = session.exec(select(Materia)).all()
     historial = session.exec(select(HistorialAcademico)).all()
 

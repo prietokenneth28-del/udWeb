@@ -30,7 +30,13 @@
     // --- Datos desde el backend -----------------------------------------
 
     async function loadPlanFromBackend() {
-        const [ciclos, historial] = await Promise.all([getPlanEstudios(), getHistorial()]);
+        // El historial requiere sesión iniciada; para visitantes anónimos
+        // ("ver el plan sin iniciar sesión") simplemente se omite y todas
+        // las materias se muestran como pendientes.
+        const [ciclos, historial] = await Promise.all([
+            getPlanEstudios(),
+            isLoggedIn() ? getHistorial() : Promise.resolve([]),
+        ]);
 
         historialPorMateria = new Map();
         historial.forEach((registro) => {

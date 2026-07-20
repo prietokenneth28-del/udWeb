@@ -1,3 +1,5 @@
+import os
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlmodel import Session, select
@@ -12,8 +14,14 @@ router = APIRouter(tags=["auth"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 
+REGISTER_SECRET = os.getenv("REGISTER_SECRET")
+
+
 @router.post("/register", status_code=status.HTTP_201_CREATED)
 def register(datos: UserCreate, session: Session = Depends(get_session)):
+    if not REGISTER_SECRET or datos.register_secret != REGISTER_SECRET:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Clave de registro incorrecta")
+
     existente = session.exec(select(User).where(User.username == datos.username)).first()
     if existente:
         raise HTTPException(status_code=400, detail="Ese username ya está registrado")
