@@ -10,6 +10,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Llamar endpoint de notificación
+        env:
+          BACKEND_URL: ${{ secrets.BACKEND_URL }}
+          TELEGRAM_NOTIFY_SECRET: ${{ secrets.TELEGRAM_NOTIFY_SECRET }}
         run: |
-          curl -sf -X POST "${{ secrets.BACKEND_URL }}/api/horario/notificar-hoy" \
-            -H "X-Bot-Secret: ${{ secrets.TELEGRAM_NOTIFY_SECRET }}"
+          url="${BACKEND_URL%/}/api/horario/notificar-hoy"
+          echo "Llamando a: $url"
+          http_status=$(curl -s -o response.json -w "%{http_code}" -X POST "$url" \
+            -H "X-Bot-Secret: $TELEGRAM_NOTIFY_SECRET")
+          echo "HTTP status: $http_status"
+          echo "Respuesta:"
+          cat response.json
+          if [ "$http_status" -lt 200 ] || [ "$http_status" -ge 300 ]; then
+            exit 1
+          fi
