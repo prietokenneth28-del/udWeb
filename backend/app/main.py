@@ -278,6 +278,36 @@ def notificar_horario_hoy(
     return {"status": "enviado", "mensaje": mensaje}
 
 
+@app.get("/api/horario/debug")
+def debug_horario(
+    x_bot_secret: str | None = Header(default=None),
+    session: Session = Depends(get_session),
+):
+    secreto_esperado = os.getenv("TELEGRAM_NOTIFY_SECRET")
+    if not secreto_esperado or x_bot_secret != secreto_esperado:
+        raise HTTPException(status_code=403, detail="Secreto inválido")
+
+    semestres = session.exec(select(SemestreHorario)).all()
+    clases = session.exec(select(ClaseHorario)).all()
+
+    return {
+        "dia_hoy_isoweekday": isoweekday_hoy(),
+        "semestre_activo_env": os.getenv("HORARIO_SEMESTRE_ACTIVO"),
+        "semestres_registrados": [{"numero": s.numero, "label": s.label} for s in semestres],
+        "clases": [
+            {
+                "id": c.id,
+                "semestre_numero": c.semestre_numero,
+                "dia": c.dia,
+                "materia": c.materia,
+                "hora_inicio": c.hora_inicio,
+                "hora_fin": c.hora_fin,
+            }
+            for c in clases
+        ],
+    }
+
+
 @app.post("/api/telegram/webhook")
 async def telegram_webhook(
     request: Request,
