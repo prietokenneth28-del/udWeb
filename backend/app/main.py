@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 
-from fastapi import FastAPI, HTTPException, Depends, Header
+from fastapi import FastAPI, HTTPException, Depends, Header, Request
 from sqlmodel import Session, select
 from app.models import (
     CicloAcademico,
@@ -16,7 +16,12 @@ from app.models import (
 )
 from app.database import get_session
 from app.auth import router as auth_router, get_current_user
-from app.telegram_bot import construir_mensaje_horario_hoy, enviar_mensaje_telegram
+from app.telegram_bot import (
+    construir_mensaje_horario_hoy,
+    enviar_mensaje_telegram,
+    isoweekday_hoy,
+    responder_actualizacion_telegram,
+)
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -268,10 +273,24 @@ def notificar_horario_hoy(
     if not secreto_esperado or x_bot_secret != secreto_esperado:
         raise HTTPException(status_code=403, detail="Secreto inválido")
 
-    dia_hoy = datetime.now().isoweekday()  # 1=Lunes .. 7=Domingo
-    mensaje = construir_mensaje_horario_hoy(session, dia_hoy)
+    mensaje = construir_mensaje_horario_hoy(session, isoweekday_hoy())
     enviar_mensaje_telegram(mensaje)
     return {"status": "enviado", "mensaje": mensaje}
+
+
+@app.post("/api/telegram/webhook")
+async def telegram_webhook(
+    request: Request,
+    x_telegram_bot_api_secret_token: str | None = Header(default=None),
+    session: Session = Depends(get_session),
+):
+    secreto_esperado = os.getenv("TELEGRAM_WEBHOOK_SECRET")
+    if secreto_esperado and x_telegram_bot_api_secret_token != secreto_esperado:
+        raise HTTPException(status_code=403, detail="Secreto inválido")
+
+    update = await request.json()
+    responder_actualizacion_telegram(session, update)
+    return {"ok": True}
 
 
 @app.get("/api/estadisticas")
