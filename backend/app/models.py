@@ -82,6 +82,26 @@ class SemestreHorarioCreate(SQLModel):
     label: str
 
 
+class Actividad(SQLModel, table=True):
+    __tablename__ = "actividad"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    materia: str
+    fecha_limite: datetime
+    modo_entrega: str
+    link: Optional[str] = None
+    descripcion: str
+    creada_en: datetime = Field(default_factory=datetime.utcnow)
+
+
+class ActividadCreate(SQLModel):
+    materia: str
+    fecha_limite: datetime
+    modo_entrega: str
+    link: Optional[str] = None
+    descripcion: str
+
+
 class User(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     username: str = Field(unique=True, index=True)

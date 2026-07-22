@@ -13,6 +13,8 @@ from app.models import (
     SemestreHorarioCreate,
     ClaseHorario,
     ClaseHorarioCreate,
+    Actividad,
+    ActividadCreate,
 )
 from app.database import get_session
 from app.auth import router as auth_router, get_current_user
@@ -321,6 +323,59 @@ async def telegram_webhook(
     update = await request.json()
     responder_actualizacion_telegram(session, update)
     return {"ok": True}
+
+
+@app.get("/api/actividades", response_model=list[Actividad])
+def obtener_actividades(
+    session: Session = Depends(get_session),
+    usuario_actual: User = Depends(get_current_user),
+):
+    return session.exec(select(Actividad)).all()
+
+
+@app.post("/api/actividades", response_model=Actividad, status_code=201)
+def crear_actividad(
+    datos: ActividadCreate,
+    session: Session = Depends(get_session),
+    usuario_actual: User = Depends(get_current_user),
+):
+    actividad = Actividad(**datos.model_dump())
+    session.add(actividad)
+    session.commit()
+    session.refresh(actividad)
+    return actividad
+
+
+@app.put("/api/actividades/{actividad_id}", response_model=Actividad)
+def actualizar_actividad(
+    actividad_id: int,
+    datos: ActividadCreate,
+    session: Session = Depends(get_session),
+    usuario_actual: User = Depends(get_current_user),
+):
+    actividad = session.get(Actividad, actividad_id)
+    if not actividad:
+        raise HTTPException(status_code=404, detail="Actividad no encontrada")
+
+    for clave, valor in datos.model_dump().items():
+        setattr(actividad, clave, valor)
+    session.add(actividad)
+    session.commit()
+    session.refresh(actividad)
+    return actividad
+
+
+@app.delete("/api/actividades/{actividad_id}", status_code=204)
+def eliminar_actividad(
+    actividad_id: int,
+    session: Session = Depends(get_session),
+    usuario_actual: User = Depends(get_current_user),
+):
+    actividad = session.get(Actividad, actividad_id)
+    if not actividad:
+        raise HTTPException(status_code=404, detail="Actividad no encontrada")
+    session.delete(actividad)
+    session.commit()
 
 
 @app.get("/api/estadisticas")

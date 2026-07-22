@@ -150,3 +150,27 @@ async function eliminarClaseHorario(claseId) {
     });
     if (!res.ok) throw new Error("No se pudo eliminar la clase");
 }
+
+async function getActividades() {
+    const res = await fetch(`${API_BASE_URL}/api/actividades`, { headers: authHeaders() });
+    if (!res.ok) throw new Error("No se pudieron cargar las actividades");
+    return res.json();
+}
+
+async function crearActividad(datos) {
+    const res = await fetch(`${API_BASE_URL}/api/actividades`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...authHeaders() },
+        body: JSON.stringify(datos),
+    });
+    if (!res.ok) throw new Error("No se pudo guardar la actividad");
+    return res.json();
+}
+
+async function eliminarActividad(actividadId) {
+    const res = await fetch(`${API_BASE_URL}/api/actividades/${actividadId}`, {
+        method: "DELETE",
+        headers: authHeaders(),
+    });
+    if (!res.ok) throw new Error("No se pudo eliminar la actividad");
+}
