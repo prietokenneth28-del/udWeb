@@ -88,10 +88,14 @@
 
                     <div id="pb-resultados" class="d-none">
                         <div class="card border-success mb-4">
-                            <div class="card-header bg-success text-dark fw-bold">
-                                <i class="bi bi-check-circle me-2"></i>Resultados
+                            <div class="card-header bg-success text-dark fw-bold d-flex justify-content-between align-items-center">
+                                <span><i class="bi bi-check-circle me-2"></i>Resultados</span>
+                                <button type="button" class="btn btn-dark btn-sm" id="pb-descargar-pdf">
+                                    <i class="bi bi-file-earmark-pdf me-1"></i> Descargar reporte PDF
+                                </button>
                             </div>
                             <div class="card-body">
+                                <div class="alert alert-danger d-none" id="pb-pdf-error"></div>
                                 <div class="table-responsive mb-3">
                                     <table class="table table-sm table-dark table-striped align-middle mb-0">
                                         <thead>

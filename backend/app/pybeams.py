@@ -4,7 +4,7 @@ import sys
 from typing import Literal, Optional
 
 import numpy as np
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from pydantic import BaseModel
 
 from app.auth import get_current_user
@@ -19,6 +19,7 @@ from discontinousFunction import numericalDiscontinousFuctions  # noqa: E402
 from matrixSolution import sumFY, sumM, singularityEq, solveEquation  # noqa: E402
 from extraValidation import loadValidation  # noqa: E402
 from grafication import plot_shear_moment, plot_free_body_diagram  # noqa: E402
+from report_reportlab import generar_reporte_pdf_bytes  # noqa: E402
 
 router = APIRouter(prefix="/api/pybeams", tags=["pybeams"])
 
@@ -106,11 +107,7 @@ def _beam_geometry(Mmax: float, Sy: float, FS: float) -> float:
     return s * 100**3  # [cm3]
 
 
-@router.post("/calcular", response_model=BeamResponse)
-def calcular_viga(
-    datos: BeamRequest,
-    usuario_actual: User = Depends(get_current_user),
-):
+def _resolver_solicitud(datos: BeamRequest):
     if not datos.supports:
         raise HTTPException(status_code=400, detail="Se requiere al menos un apoyo")
     if not datos.loads:
@@ -146,6 +143,15 @@ def calcular_viga(
         )
 
     s = _beam_geometry(Mmax, datos.Sy, datos.FS)
+    return r, f, Mmax, r_sol, v, M, s
+
+
+@router.post("/calcular", response_model=BeamResponse)
+def calcular_viga(
+    datos: BeamRequest,
+    usuario_actual: User = Depends(get_current_user),
+):
+    r, f, Mmax, r_sol, v, M, s = _resolver_solicitud(datos)
 
     shear_moment_png = plot_shear_moment(v.flatten(), M.flatten(), datos.l, return_bytes=True)
     free_body_png = plot_free_body_diagram(r, f, TYPES_LOADS, datos.l, return_bytes=True)
@@ -165,4 +171,27 @@ def calcular_viga(
             "shear_moment": base64.b64encode(shear_moment_png).decode("ascii"),
             "free_body": base64.b64encode(free_body_png).decode("ascii"),
         },
+    )
+
+
+@router.post("/reporte")
+def descargar_reporte(
+    datos: BeamRequest,
+    usuario_actual: User = Depends(get_current_user),
+):
+    r, f, Mmax, r_sol, v, M, s = _resolver_solicitud(datos)
+
+    shear_moment_png = plot_shear_moment(v.flatten(), M.flatten(), datos.l, return_bytes=True)
+    free_body_png = plot_free_body_diagram(r, f, TYPES_LOADS, datos.l, return_bytes=True)
+
+    pdf_bytes = generar_reporte_pdf_bytes(
+        datos.l, datos.Sy, datos.FS, r_sol, r, f, Mmax, s, TYPES_LOADS,
+        imagen_dcl_bytes=free_body_png,
+        imagen_diagramas_bytes=shear_moment_png,
+    )
+
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": 'attachment; filename="reporte_viga.pdf"'},
     )

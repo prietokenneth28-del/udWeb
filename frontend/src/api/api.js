@@ -187,3 +187,16 @@ async function calcularViga(datos) {
     }
     return res.json();
 }
+
+async function descargarReportePyBeams(datos) {
+    const res = await fetch(`${API_BASE_URL}/api/pybeams/reporte`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...authHeaders() },
+        body: JSON.stringify(datos),
+    });
+    if (!res.ok) {
+        const detalle = await res.json().catch(() => null);
+        throw new Error(detalle?.detail || "No se pudo generar el reporte PDF");
+    }
+    return res.blob();
+}

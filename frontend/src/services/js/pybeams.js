@@ -17,6 +17,10 @@
     const form = document.getElementById("form-pybeams");
     const submitBtn = document.getElementById("pb-submit");
     const errorBox = document.getElementById("pb-error");
+    const pdfBtn = document.getElementById("pb-descargar-pdf");
+    const pdfErrorBox = document.getElementById("pb-pdf-error");
+
+    let ultimoPayload = null;
 
     const supportsContainer = document.getElementById("pb-supports-container");
     const loadsContainer = document.getElementById("pb-loads-container");
@@ -195,6 +199,7 @@
         try {
             const payload = recolectarPayload();
             const data = await calcularViga(payload);
+            ultimoPayload = payload;
             renderizarResultados(data);
         } catch (err) {
             errorBox.textContent = err.message;
@@ -202,6 +207,35 @@
         } finally {
             submitBtn.disabled = false;
             submitBtn.innerHTML = textoOriginal;
+        }
+    });
+
+    // --- Descarga del reporte en PDF ------------------------------------
+
+    pdfBtn.addEventListener("click", async () => {
+        if (!ultimoPayload) return;
+        pdfErrorBox.classList.add("d-none");
+
+        pdfBtn.disabled = true;
+        const textoOriginal = pdfBtn.innerHTML;
+        pdfBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Generando...';
+
+        try {
+            const blob = await descargarReportePyBeams(ultimoPayload);
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "reporte_viga.pdf";
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(url);
+        } catch (err) {
+            pdfErrorBox.textContent = err.message;
+            pdfErrorBox.classList.remove("d-none");
+        } finally {
+            pdfBtn.disabled = false;
+            pdfBtn.innerHTML = textoOriginal;
         }
     });
 
