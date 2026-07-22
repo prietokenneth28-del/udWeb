@@ -24,10 +24,18 @@ from app.telegram_bot import (
     isoweekday_hoy,
     responder_actualizacion_telegram,
 )
+from app.rate_limit import limiter
 
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="Plan de Estudios API")
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_middleware(SlowAPIMiddleware)
 
 origenes_permitidos = [
     "http://127.0.0.1:5500",
@@ -267,7 +275,9 @@ def eliminar_clase_horario(
 
 
 @app.post("/api/horario/notificar-hoy")
+@limiter.limit("5/minute")
 def notificar_horario_hoy(
+    request: Request,
     x_bot_secret: str | None = Header(default=None),
     session: Session = Depends(get_session),
 ):
@@ -281,7 +291,9 @@ def notificar_horario_hoy(
 
 
 @app.get("/api/horario/debug")
+@limiter.limit("5/minute")
 def debug_horario(
+    request: Request,
     x_bot_secret: str | None = Header(default=None),
     session: Session = Depends(get_session),
 ):
@@ -311,6 +323,7 @@ def debug_horario(
 
 
 @app.post("/api/telegram/webhook")
+@limiter.limit("30/minute")
 async def telegram_webhook(
     request: Request,
     x_telegram_bot_api_secret_token: str | None = Header(default=None),

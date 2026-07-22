@@ -1,6 +1,6 @@
 import os
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlmodel import Session, select
 
@@ -8,6 +8,7 @@ from app.database import get_session
 from app.models import User
 from app.security import hash_password, verify_password, crear_access_token, decodificar_access_token
 from app.models import User, UserCreate
+from app.rate_limit import limiter
 
 router = APIRouter(tags=["auth"])
 
@@ -18,7 +19,8 @@ REGISTER_SECRET = os.getenv("REGISTER_SECRET")
 
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
-def register(datos: UserCreate, session: Session = Depends(get_session)):
+@limiter.limit("5/minute")
+def register(request: Request, datos: UserCreate, session: Session = Depends(get_session)):
     if not REGISTER_SECRET or datos.register_secret != REGISTER_SECRET:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Clave de registro incorrecta")
 
@@ -34,7 +36,8 @@ def register(datos: UserCreate, session: Session = Depends(get_session)):
 
 
 @router.post("/login")
-def login(form_data: OAuth2PasswordRequestForm = Depends(), session: Session = Depends(get_session)):
+@limiter.limit("10/minute")
+def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends(), session: Session = Depends(get_session)):
     usuario = session.exec(select(User).where(User.username == form_data.username)).first()
 
     if not usuario or not verify_password(form_data.password, usuario.hashed_password):
