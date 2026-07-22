@@ -29,10 +29,15 @@
             return;
         }
 
-        const numeros = Object.keys(horario.semesters || {}).map(Number);
-        if (numeros.length === 0) return;
+        // El semestre "actual" es el de número más alto que ya tenga clases
+        // registradas — un semestre recién creado y todavía vacío (ej. el
+        // siguiente periodo) no debe dejar el selector sin materias.
+        const numerosConClases = Object.entries(horario.semesters || {})
+            .filter(([, data]) => (data.classes || []).length > 0)
+            .map(([numero]) => Number(numero));
+        if (numerosConClases.length === 0) return;
 
-        const semestreActual = String(Math.max(...numeros));
+        const semestreActual = String(Math.max(...numerosConClases));
         const clasesSemestre = horario.semesters[semestreActual].classes || [];
         const materiasUnicas = [...new Set(clasesSemestre.map((c) => c.materia))];
 
