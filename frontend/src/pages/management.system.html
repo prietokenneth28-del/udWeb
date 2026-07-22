@@ -34,6 +34,180 @@
             vertical-align: middle;
             font-size: 0.9em;
         }
+
+        /* --- Gráficos: paleta validada (dataviz skill), solo modo oscuro
+           porque el sitio fuerza data-bs-theme="dark" en todas las páginas --- */
+        .viz-root {
+            --viz-surface: #1a1a19;
+            --viz-text-primary: #ffffff;
+            --viz-text-secondary: #c3c2b7;
+            --viz-text-muted: #898781;
+            --viz-gridline: #2c2c2a;
+            --viz-axis: #383835;
+            --viz-blue: #3987e5;
+            --viz-blue-track: rgba(57, 135, 229, 0.20);
+            --viz-good: #0ca30c;
+            --viz-warning: #fab219;
+            --viz-critical: #d03b3b;
+            --viz-neutral: #6b6a66;
+        }
+
+        .viz-card {
+            background-color: var(--viz-surface);
+            border-color: var(--viz-axis);
+        }
+
+        .viz-stat-label {
+            color: var(--viz-text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .viz-stat-value {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--viz-text-primary);
+            line-height: 1.1;
+        }
+
+        .viz-stat-sub {
+            color: var(--viz-text-muted);
+            font-size: 0.8rem;
+        }
+
+        /* Meter: track = paso más claro de la misma rampa; fill = el hue */
+        .viz-meter-track {
+            height: 10px;
+            border-radius: 5px;
+            background-color: var(--viz-blue-track);
+            overflow: hidden;
+        }
+
+        .viz-meter-fill {
+            height: 100%;
+            background-color: var(--viz-blue);
+            border-radius: 5px;
+            transition: width 0.4s ease;
+        }
+
+        /* Gráfico de líneas (SVG) */
+        .viz-line-wrap {
+            position: relative;
+        }
+
+        .viz-axis-label {
+            fill: var(--viz-text-muted);
+            font-size: 10px;
+        }
+
+        .viz-gridline {
+            stroke: var(--viz-gridline);
+            stroke-width: 1;
+        }
+
+        .viz-line-path {
+            fill: none;
+            stroke: var(--viz-blue);
+            stroke-width: 2;
+            stroke-linejoin: round;
+            stroke-linecap: round;
+        }
+
+        .viz-line-dot {
+            fill: var(--viz-blue);
+            stroke: var(--viz-surface);
+            stroke-width: 2;
+        }
+
+        .viz-line-label {
+            fill: var(--viz-text-primary);
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .viz-crosshair {
+            stroke: var(--viz-axis);
+            stroke-width: 1;
+            pointer-events: none;
+        }
+
+        .viz-hit-target {
+            fill: transparent;
+            cursor: pointer;
+        }
+
+        /* Tooltip compartido */
+        .viz-tooltip {
+            position: fixed;
+            z-index: 1080;
+            background-color: #0d0d0d;
+            border: 1px solid var(--viz-axis);
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-size: 0.8rem;
+            color: var(--viz-text-secondary);
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .viz-tooltip strong {
+            color: var(--viz-text-primary);
+        }
+
+        /* Gráfico de barras (divs) */
+        .viz-bars-row {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 180px;
+            gap: 12px;
+            padding-top: 24px;
+        }
+
+        .viz-bar-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            height: 100%;
+            flex: 1;
+        }
+
+        .viz-bar-value {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--viz-text-primary);
+            margin-bottom: 4px;
+        }
+
+        .viz-bar {
+            width: 100%;
+            max-width: 40px;
+            border-radius: 4px 4px 0 0;
+            cursor: pointer;
+            transition: filter 0.15s ease;
+        }
+
+        .viz-bar:hover {
+            filter: brightness(1.2);
+        }
+
+        .viz-bar-label {
+            margin-top: 8px;
+            font-size: 0.75rem;
+            color: var(--viz-text-secondary);
+            text-align: center;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .viz-bar-swatch {
+            width: 8px;
+            height: 8px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
     </style>
 </head>
 <body>
@@ -41,6 +215,81 @@
 
     <div class="container-fluid mt-4">
         <main>
+            <div class="viz-root mb-4">
+                <!-- KPIs -->
+                <div class="row g-3 mb-3" id="kpi-row">
+                    <div class="col-6 col-lg-3">
+                        <div class="card viz-card h-100">
+                            <div class="card-body">
+                                <div class="viz-stat-label">Créditos aprobados</div>
+                                <div class="viz-stat-value" id="kpi-creditos">0 / 0</div>
+                                <div class="viz-stat-sub" id="kpi-creditos-sub"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-3">
+                        <div class="card viz-card h-100">
+                            <div class="card-body">
+                                <div class="viz-stat-label">Avance de la carrera</div>
+                                <div class="viz-stat-value" id="kpi-avance">0%</div>
+                                <div class="viz-meter-track mt-2">
+                                    <div class="viz-meter-fill" id="kpi-avance-fill" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-3">
+                        <div class="card viz-card h-100">
+                            <div class="card-body">
+                                <div class="viz-stat-label">Promedio global (PAPA)</div>
+                                <div class="viz-stat-value" id="kpi-papa">-</div>
+                                <div class="viz-stat-sub">Ponderado por créditos</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-3">
+                        <div class="card viz-card h-100">
+                            <div class="card-body">
+                                <div class="viz-stat-label">Materias pendientes</div>
+                                <div class="viz-stat-value" id="kpi-pendientes">0</div>
+                                <div class="viz-stat-sub">De <span id="kpi-pendientes-total">0</span> en el plan</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Avance por ciclo -->
+                <div class="row g-3 mb-3" id="meters-row"></div>
+
+                <!-- Evolución del promedio + materias por estado -->
+                <div class="row g-3 mb-4">
+                    <div class="col-lg-7">
+                        <div class="card viz-card h-100">
+                            <div class="card-header border-secondary">
+                                <i class="bi bi-graph-up"></i> Evolución del promedio por periodo académico
+                            </div>
+                            <div class="card-body viz-line-wrap">
+                                <svg id="chart-linea" viewBox="0 0 480 220" width="100%" height="220" role="img"
+                                    aria-label="Evolución del promedio ponderado por periodo académico"></svg>
+                                <div class="viz-tooltip" id="linea-tooltip" hidden></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-5">
+                        <div class="card viz-card h-100">
+                            <div class="card-header border-secondary">
+                                <i class="bi bi-bar-chart"></i> Materias por estado
+                            </div>
+                            <div class="card-body">
+                                <div class="viz-bars-row" id="chart-barras" role="img"
+                                    aria-label="Cantidad de materias por estado"></div>
+                                <div class="viz-tooltip" id="barras-tooltip" hidden></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="card text-center mb-4">
                 <div class="card-header title-banner py-2">
                     <h4 class="mb-0">Histórico de Notas</h4>
@@ -137,6 +386,310 @@
 
                 ciclosCache = ciclos;
                 return ciclos;
+            }
+
+            // --- Estadísticas y gráficos ------------------------------------
+
+            function computeStats(ciclos) {
+                const materias = [];
+                ciclos.forEach((ciclo) => {
+                    ciclo.semestres.forEach((semestre) => {
+                        semestre.materias.forEach((materia) => {
+                            materias.push({ ...materia, cicloId: ciclo.id, cicloNombre: ciclo.nombre });
+                        });
+                    });
+                });
+
+                let creditosTotales = 0;
+                let creditosAprobados = 0;
+                const porCicloMap = new Map();
+                const porEstado = { "Aprobada": 0, "Reprobada": 0, "En curso": 0, "Pendiente": 0 };
+
+                materias.forEach((materia) => {
+                    creditosTotales += materia.creditos;
+
+                    if (!porCicloMap.has(materia.cicloId)) {
+                        porCicloMap.set(materia.cicloId, { nombre: materia.cicloNombre, total: 0, aprobados: 0 });
+                    }
+                    const ciclo = porCicloMap.get(materia.cicloId);
+                    ciclo.total += materia.creditos;
+
+                    const registro = historialPorMateria.get(materia.id);
+                    const estado = registro ? registro.estado : "Pendiente";
+                    if (porEstado[estado] === undefined) porEstado[estado] = 0;
+                    porEstado[estado] += 1;
+
+                    if (estado === "Aprobada") {
+                        creditosAprobados += materia.creditos;
+                        ciclo.aprobados += materia.creditos;
+                    }
+                });
+
+                const registrosConNota = Array.from(historialPorMateria.values()).filter((r) => r.nota_final !== null);
+                const materiasPorId = new Map(materias.map((m) => [m.id, m]));
+
+                let sumaPonderada = 0;
+                let creditosConNota = 0;
+                registrosConNota.forEach((r) => {
+                    const creditos = materiasPorId.get(r.materia_id)?.creditos || 0;
+                    sumaPonderada += r.nota_final * creditos;
+                    creditosConNota += creditos;
+                });
+                const papa = creditosConNota > 0 ? sumaPonderada / creditosConNota : null;
+
+                const porPeriodoMap = new Map();
+                registrosConNota
+                    .filter((r) => r.periodo)
+                    .forEach((r) => {
+                        const creditos = materiasPorId.get(r.materia_id)?.creditos || 0;
+                        if (!porPeriodoMap.has(r.periodo)) {
+                            porPeriodoMap.set(r.periodo, { sumaPonderada: 0, creditos: 0 });
+                        }
+                        const acumulado = porPeriodoMap.get(r.periodo);
+                        acumulado.sumaPonderada += r.nota_final * creditos;
+                        acumulado.creditos += creditos;
+                    });
+
+                const porPeriodo = Array.from(porPeriodoMap.entries())
+                    .map(([periodo, { sumaPonderada, creditos }]) => ({
+                        periodo,
+                        promedio: creditos > 0 ? sumaPonderada / creditos : null,
+                    }))
+                    .filter((p) => p.promedio !== null)
+                    .sort((a, b) => a.periodo.localeCompare(b.periodo));
+
+                return {
+                    creditosTotales,
+                    creditosAprobados,
+                    porcentajeAvance: creditosTotales > 0 ? (creditosAprobados / creditosTotales) * 100 : 0,
+                    papa,
+                    porCiclo: Array.from(porCicloMap.values()),
+                    porEstado,
+                    porPeriodo,
+                    materiasTotales: materias.length,
+                    materiasPendientes: porEstado["Pendiente"] || 0,
+                };
+            }
+
+            function renderKPIs(stats) {
+                document.getElementById('kpi-creditos').textContent =
+                    `${Math.round(stats.creditosAprobados)} / ${Math.round(stats.creditosTotales)}`;
+                document.getElementById('kpi-creditos-sub').textContent = 'créditos del plan';
+
+                const avance = Math.round(stats.porcentajeAvance * 10) / 10;
+                document.getElementById('kpi-avance').textContent = `${avance}%`;
+                document.getElementById('kpi-avance-fill').style.width = `${Math.min(avance, 100)}%`;
+
+                document.getElementById('kpi-papa').textContent = stats.papa !== null ? stats.papa.toFixed(2) : '-';
+
+                document.getElementById('kpi-pendientes').textContent = stats.materiasPendientes;
+                document.getElementById('kpi-pendientes-total').textContent = stats.materiasTotales;
+            }
+
+            function renderMeters(stats) {
+                const row = document.getElementById('meters-row');
+                row.innerHTML = '';
+
+                stats.porCiclo.forEach((ciclo) => {
+                    const porcentaje = ciclo.total > 0 ? Math.round((ciclo.aprobados / ciclo.total) * 1000) / 10 : 0;
+                    const col = document.createElement('div');
+                    col.className = 'col-12 col-md-6';
+                    col.innerHTML = `
+                        <div class="card viz-card h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-baseline mb-2">
+                                    <span class="viz-stat-label mb-0">${ciclo.nombre}</span>
+                                    <span class="viz-stat-sub">${Math.round(ciclo.aprobados)} / ${Math.round(ciclo.total)} créditos</span>
+                                </div>
+                                <div class="viz-meter-track">
+                                    <div class="viz-meter-fill" style="width: ${Math.min(porcentaje, 100)}%"></div>
+                                </div>
+                                <div class="viz-stat-sub mt-1">${porcentaje}% completado</div>
+                            </div>
+                        </div>
+                    `;
+                    row.appendChild(col);
+                });
+            }
+
+            function mostrarTooltip(tooltipEl, html, clientX, clientY) {
+                tooltipEl.innerHTML = html;
+                tooltipEl.hidden = false;
+                const offset = 14;
+                let left = clientX + offset;
+                let top = clientY + offset;
+                const rect = tooltipEl.getBoundingClientRect();
+                if (left + rect.width > window.innerWidth) left = clientX - rect.width - offset;
+                if (top + rect.height > window.innerHeight) top = clientY - rect.height - offset;
+                tooltipEl.style.left = `${left}px`;
+                tooltipEl.style.top = `${top}px`;
+            }
+
+            function ocultarTooltip(tooltipEl) {
+                tooltipEl.hidden = true;
+            }
+
+            function renderLineChart(porPeriodo) {
+                const svg = document.getElementById('chart-linea');
+                const tooltip = document.getElementById('linea-tooltip');
+                svg.innerHTML = '';
+
+                const width = 480, height = 220;
+                const margin = { top: 16, right: 20, bottom: 28, left: 32 };
+                const plotW = width - margin.left - margin.right;
+                const plotH = height - margin.top - margin.bottom;
+                const ns = 'http://www.w3.org/2000/svg';
+
+                if (porPeriodo.length === 0) {
+                    const texto = document.createElementNS(ns, 'text');
+                    texto.setAttribute('x', width / 2);
+                    texto.setAttribute('y', height / 2);
+                    texto.setAttribute('text-anchor', 'middle');
+                    texto.setAttribute('class', 'viz-axis-label');
+                    texto.textContent = 'Aún no hay notas con periodo registrado.';
+                    svg.appendChild(texto);
+                    return;
+                }
+
+                const yScale = (valor) => margin.top + plotH - (valor / 5) * plotH;
+                const xScale = (i) => porPeriodo.length === 1
+                    ? margin.left + plotW / 2
+                    : margin.left + (i / (porPeriodo.length - 1)) * plotW;
+
+                // Gridlines horizontales (0 a 5)
+                for (let v = 0; v <= 5; v++) {
+                    const y = yScale(v);
+                    const linea = document.createElementNS(ns, 'line');
+                    linea.setAttribute('x1', margin.left);
+                    linea.setAttribute('x2', width - margin.right);
+                    linea.setAttribute('y1', y);
+                    linea.setAttribute('y2', y);
+                    linea.setAttribute('class', 'viz-gridline');
+                    svg.appendChild(linea);
+
+                    const label = document.createElementNS(ns, 'text');
+                    label.setAttribute('x', margin.left - 6);
+                    label.setAttribute('y', y + 3);
+                    label.setAttribute('text-anchor', 'end');
+                    label.setAttribute('class', 'viz-axis-label');
+                    label.textContent = v;
+                    svg.appendChild(label);
+                }
+
+                // Etiquetas de periodo en el eje X
+                porPeriodo.forEach((p, i) => {
+                    const label = document.createElementNS(ns, 'text');
+                    label.setAttribute('x', xScale(i));
+                    label.setAttribute('y', height - 8);
+                    label.setAttribute('text-anchor', 'middle');
+                    label.setAttribute('class', 'viz-axis-label');
+                    label.textContent = p.periodo;
+                    svg.appendChild(label);
+                });
+
+                // Línea
+                const puntos = porPeriodo.map((p, i) => `${xScale(i)},${yScale(p.promedio)}`).join(' ');
+                const path = document.createElementNS(ns, 'polyline');
+                path.setAttribute('points', puntos);
+                path.setAttribute('class', 'viz-line-path');
+                svg.appendChild(path);
+
+                // Marcadores + hit targets
+                porPeriodo.forEach((p, i) => {
+                    const cx = xScale(i);
+                    const cy = yScale(p.promedio);
+
+                    const dot = document.createElementNS(ns, 'circle');
+                    dot.setAttribute('cx', cx);
+                    dot.setAttribute('cy', cy);
+                    dot.setAttribute('r', 5);
+                    dot.setAttribute('class', 'viz-line-dot');
+                    svg.appendChild(dot);
+
+                    if (i === porPeriodo.length - 1) {
+                        const label = document.createElementNS(ns, 'text');
+                        label.setAttribute('x', cx);
+                        label.setAttribute('y', cy - 12);
+                        label.setAttribute('text-anchor', 'middle');
+                        label.setAttribute('class', 'viz-line-label');
+                        label.textContent = p.promedio.toFixed(2);
+                        svg.appendChild(label);
+                    }
+
+                    const hit = document.createElementNS(ns, 'rect');
+                    hit.setAttribute('x', cx - 14);
+                    hit.setAttribute('y', margin.top);
+                    hit.setAttribute('width', 28);
+                    hit.setAttribute('height', plotH);
+                    hit.setAttribute('class', 'viz-hit-target');
+                    hit.tabIndex = 0;
+                    hit.addEventListener('pointerenter', (e) => {
+                        mostrarTooltip(tooltip, `<strong>${p.promedio.toFixed(2)}</strong> — ${p.periodo}`, e.clientX, e.clientY);
+                    });
+                    hit.addEventListener('pointermove', (e) => {
+                        mostrarTooltip(tooltip, `<strong>${p.promedio.toFixed(2)}</strong> — ${p.periodo}`, e.clientX, e.clientY);
+                    });
+                    hit.addEventListener('pointerleave', () => ocultarTooltip(tooltip));
+                    hit.addEventListener('focus', (e) => {
+                        const box = hit.getBoundingClientRect();
+                        mostrarTooltip(tooltip, `<strong>${p.promedio.toFixed(2)}</strong> — ${p.periodo}`, box.left, box.top);
+                    });
+                    hit.addEventListener('blur', () => ocultarTooltip(tooltip));
+                    svg.appendChild(hit);
+                });
+            }
+
+            function renderBarChart(porEstado) {
+                const container = document.getElementById('chart-barras');
+                const tooltip = document.getElementById('barras-tooltip');
+                container.innerHTML = '';
+
+                const config = [
+                    { key: 'Aprobada', color: 'var(--viz-good)' },
+                    { key: 'En curso', color: 'var(--viz-warning)' },
+                    { key: 'Reprobada', color: 'var(--viz-critical)' },
+                    { key: 'Pendiente', color: 'var(--viz-neutral)' },
+                ];
+
+                const maxValor = Math.max(1, ...config.map((c) => porEstado[c.key] || 0));
+
+                config.forEach(({ key, color }) => {
+                    const valor = porEstado[key] || 0;
+                    const alturaPct = (valor / maxValor) * 100;
+
+                    const col = document.createElement('div');
+                    col.className = 'viz-bar-col';
+                    col.innerHTML = `
+                        <div class="viz-bar-value">${valor}</div>
+                        <div class="viz-bar" style="height: ${alturaPct}%; background-color: ${color};"
+                            tabindex="0" role="img" aria-label="${key}: ${valor} materias"></div>
+                        <div class="viz-bar-label">
+                            <span class="viz-bar-swatch" style="background-color: ${color};"></span>${key}
+                        </div>
+                    `;
+
+                    const bar = col.querySelector('.viz-bar');
+                    const mostrar = (e) => {
+                        const clientX = e.clientX ?? bar.getBoundingClientRect().left;
+                        const clientY = e.clientY ?? bar.getBoundingClientRect().top;
+                        mostrarTooltip(tooltip, `<strong>${valor}</strong> ${key}`, clientX, clientY);
+                    };
+                    bar.addEventListener('pointerenter', mostrar);
+                    bar.addEventListener('pointermove', mostrar);
+                    bar.addEventListener('pointerleave', () => ocultarTooltip(tooltip));
+                    bar.addEventListener('focus', mostrar);
+                    bar.addEventListener('blur', () => ocultarTooltip(tooltip));
+
+                    container.appendChild(col);
+                });
+            }
+
+            function renderGraficos(ciclos) {
+                const stats = computeStats(ciclos);
+                renderKPIs(stats);
+                renderMeters(stats);
+                renderLineChart(stats.porPeriodo);
+                renderBarChart(stats.porEstado);
             }
 
             function renderTabla(ciclos) {
@@ -250,6 +803,7 @@
                     }
                     historialPorMateria.set(materiaSeleccionada, actualizado);
                     renderTabla(ciclosCache);
+                    renderGraficos(ciclosCache);
                     notaModal.hide();
                 } catch (err) {
                     errorBox.textContent = err.message;
@@ -268,6 +822,7 @@
                     await eliminarHistorial(registro.id);
                     historialPorMateria.delete(materiaSeleccionada);
                     renderTabla(ciclosCache);
+                    renderGraficos(ciclosCache);
                     notaModal.hide();
                 } catch (err) {
                     const errorBox = document.getElementById('notaError');
@@ -294,6 +849,7 @@
                 }
 
                 renderTabla(ciclos);
+                renderGraficos(ciclos);
 
                 tableBody.addEventListener('click', (event) => {
                     const btn = event.target.closest('.btn-editar-nota');
