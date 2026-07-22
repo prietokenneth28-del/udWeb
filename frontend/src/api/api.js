@@ -174,3 +174,16 @@ async function eliminarActividad(actividadId) {
     });
     if (!res.ok) throw new Error("No se pudo eliminar la actividad");
 }
+
+async function calcularViga(datos) {
+    const res = await fetch(`${API_BASE_URL}/api/pybeams/calcular`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...authHeaders() },
+        body: JSON.stringify(datos),
+    });
+    if (!res.ok) {
+        const detalle = await res.json().catch(() => null);
+        throw new Error(detalle?.detail || "No se pudo calcular la viga");
+    }
+    return res.json();
+}

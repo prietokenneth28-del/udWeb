@@ -12,6 +12,8 @@ greenlet==3.5.3
 h11==0.16.0
 httpx==0.28.1
 idna==3.18
+matplotlib==3.10.7
+numpy==2.3.4
 passlib==1.7.4
 psycopg2-binary==2.9.12
 pyasn1==0.6.4

@@ -18,6 +18,7 @@ from app.models import (
 )
 from app.database import get_session
 from app.auth import router as auth_router, get_current_user
+from app.pybeams import router as pybeams_router
 from app.telegram_bot import (
     construir_mensaje_horario_hoy,
     enviar_mensaje_telegram,
@@ -53,6 +54,7 @@ app.add_middleware(
 )
 
 app.include_router(auth_router)
+app.include_router(pybeams_router)
 
 
 def _materia_dict(materia: Materia) -> dict:

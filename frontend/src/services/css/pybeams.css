@@ -1,0 +1,14 @@
+/* PyBeams — estilos */
+
+.pybeams-row {
+    padding: 0.5rem;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.375rem;
+    background-color: var(--bs-tertiary-bg);
+}
+
+.pybeams-diagram-img {
+    max-width: 100%;
+    background-color: #fff;
+    padding: 0.5rem;
+}

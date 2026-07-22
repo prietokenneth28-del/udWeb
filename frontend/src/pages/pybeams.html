@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="dark">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PyBeams - Kenneth Prieto</title>
+    <!-- Hojas de estilo -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="/services/css/planEstudios.css">
+    <link rel="stylesheet" href="/services/css/pybeams.css">
+</head>
+<body>
+    <div id="header-container"></div>
+
+    <div class="container-fluid mt-4 mb-5">
+        <main>
+            <div class="d-flex align-items-center gap-2 mb-4">
+                <i class="bi bi-rulers fs-3 text-info"></i>
+                <div>
+                    <h2 class="mb-0">PyBeams</h2>
+                    <p class="text-body-secondary mb-0">Cálculo de reacciones y diagramas de cortante/momento para vigas isostáticas e hiperestáticas.</p>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <!-- Formulario -->
+                <div class="col-12 col-lg-5">
+                    <form id="form-pybeams">
+                        <div class="card border-info mb-4">
+                            <div class="card-header bg-info text-dark fw-bold">
+                                <i class="bi bi-sliders me-2"></i>Geometría y material
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-4">
+                                        <label for="pb-longitud" class="form-label">Longitud (m)</label>
+                                        <input type="number" step="any" min="0.01" class="form-control" id="pb-longitud" value="6" required>
+                                    </div>
+                                    <div class="col-4">
+                                        <label for="pb-sy" class="form-label">Sy (MPa)</label>
+                                        <input type="number" step="any" min="0.01" class="form-control" id="pb-sy" value="250" required>
+                                    </div>
+                                    <div class="col-4">
+                                        <label for="pb-fs" class="form-label">Factor de seguridad</label>
+                                        <input type="number" step="any" min="0.01" class="form-control" id="pb-fs" value="1.5" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card border-secondary mb-4">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span class="fw-bold"><i class="bi bi-columns-gap me-2"></i>Apoyos</span>
+                                <button type="button" class="btn btn-outline-info btn-sm" id="pb-add-support">
+                                    <i class="bi bi-plus-lg"></i> Agregar apoyo
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div id="pb-supports-container" class="d-flex flex-column gap-2"></div>
+                            </div>
+                        </div>
+
+                        <div class="card border-secondary mb-4">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span class="fw-bold"><i class="bi bi-arrow-down-circle me-2"></i>Cargas</span>
+                                <button type="button" class="btn btn-outline-info btn-sm" id="pb-add-load">
+                                    <i class="bi bi-plus-lg"></i> Agregar carga
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div id="pb-loads-container" class="d-flex flex-column gap-2"></div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-danger d-none" id="pb-error"></div>
+                        <button type="submit" class="btn btn-info w-100 fw-bold" id="pb-submit">
+                            <i class="bi bi-calculator me-1"></i> Calcular
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Resultados -->
+                <div class="col-12 col-lg-7">
+                    <div id="pb-resultados-vacio" class="alert alert-secondary text-center">
+                        Define la geometría, los apoyos y las cargas de tu viga y presiona "Calcular" para ver las reacciones y los diagramas.
+                    </div>
+
+                    <div id="pb-resultados" class="d-none">
+                        <div class="card border-success mb-4">
+                            <div class="card-header bg-success text-dark fw-bold">
+                                <i class="bi bi-check-circle me-2"></i>Resultados
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive mb-3">
+                                    <table class="table table-sm table-dark table-striped align-middle mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Apoyo</th>
+                                                <th>Reacción</th>
+                                                <th>Ubicación (m)</th>
+                                                <th>Unidad</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="pb-reacciones-body"></tbody>
+                                    </table>
+                                </div>
+                                <div class="row g-3 text-center">
+                                    <div class="col-6">
+                                        <div class="p-3 rounded bg-body-tertiary">
+                                            <div class="small text-body-secondary">Momento máximo</div>
+                                            <div class="fs-5 fw-bold" id="pb-mmax">—</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="p-3 rounded bg-body-tertiary">
+                                            <div class="small text-body-secondary">Módulo de sección requerido</div>
+                                            <div class="fs-5 fw-bold" id="pb-smod">—</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card border-secondary mb-4">
+                            <div class="card-header fw-bold"><i class="bi bi-diagram-2 me-2"></i>Diagrama de cuerpo libre</div>
+                            <div class="card-body text-center">
+                                <img id="pb-img-dcl" class="img-fluid rounded pybeams-diagram-img" alt="Diagrama de cuerpo libre">
+                            </div>
+                        </div>
+
+                        <div class="card border-secondary mb-4">
+                            <div class="card-header fw-bold"><i class="bi bi-graph-up me-2"></i>Diagramas de cortante y momento</div>
+                            <div class="card-body text-center">
+                                <img id="pb-img-vm" class="img-fluid rounded pybeams-diagram-img" alt="Diagramas de cortante y momento">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="footer-container"></div>
+
+    <!-- Plantillas para filas dinámicas -->
+    <template id="pb-support-row-template">
+        <div class="pybeams-row d-flex align-items-end gap-2" data-support-row>
+            <div class="flex-shrink-0" style="width: 3.5rem;">
+                <label class="form-label small mb-1">Nombre</label>
+                <input type="text" class="form-control form-control-sm" data-field="name" readonly>
+            </div>
+            <div class="flex-grow-1">
+                <label class="form-label small mb-1">Ubicación (m)</label>
+                <input type="number" step="any" min="0" class="form-control form-control-sm" data-field="location" required>
+            </div>
+            <div class="flex-grow-1">
+                <label class="form-label small mb-1">Tipo</label>
+                <select class="form-select form-select-sm" data-field="type">
+                    <option value="Pinned">Articulado (Pinned)</option>
+                    <option value="Roller">Rodillo (Roller)</option>
+                    <option value="Fixed">Empotrado (Fixed)</option>
+                </select>
+            </div>
+            <button type="button" class="btn btn-outline-danger btn-sm" data-remove-support title="Eliminar apoyo">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+    </template>
+
+    <template id="pb-load-row-template">
+        <div class="pybeams-row d-flex flex-wrap align-items-end gap-2" data-load-row>
+            <div class="flex-shrink-0" style="width: 3.5rem;">
+                <label class="form-label small mb-1">Nombre</label>
+                <input type="text" class="form-control form-control-sm" data-field="name" readonly>
+            </div>
+            <div style="min-width: 9rem;">
+                <label class="form-label small mb-1">Tipo</label>
+                <select class="form-select form-select-sm" data-field="type">
+                    <option value="Point load">Puntual</option>
+                    <option value="Uniformly distributed">Distribuida uniforme</option>
+                    <option value="Triangular distributed 1">Triangular (0 → máx)</option>
+                    <option value="Triangular distributed 2">Triangular (máx → 0)</option>
+                    <option value="Moment load">Momento puntual</option>
+                </select>
+            </div>
+            <div style="width: 6rem;">
+                <label class="form-label small mb-1" data-value-label>Valor (kN)</label>
+                <input type="number" step="any" class="form-control form-control-sm" data-field="value" required>
+            </div>
+            <div style="width: 5.5rem;">
+                <label class="form-label small mb-1" data-a-label>Posición a (m)</label>
+                <input type="number" step="any" min="0" class="form-control form-control-sm" data-field="a" required>
+            </div>
+            <div style="width: 5.5rem;" data-a1-wrapper>
+                <label class="form-label small mb-1">Hasta a1 (m)</label>
+                <input type="number" step="any" min="0" class="form-control form-control-sm" data-field="a1">
+            </div>
+            <button type="button" class="btn btn-outline-danger btn-sm" data-remove-load title="Eliminar carga">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+    </template>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/api/api.js"></script>
+    <script src="/services/js/components.js"></script>
+    <script src="/services/js/pybeams.js"></script>
+</body>
+</html>

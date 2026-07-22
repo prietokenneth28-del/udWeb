@@ -25,9 +25,21 @@
 
     function markActiveNavLink() {
         const currentPath = window.location.pathname;
-        document.querySelectorAll("#main-nav .nav-link").forEach((link) => {
-            const linkPath = new URL(link.getAttribute("href"), window.location.origin).pathname;
-            link.classList.toggle("active", linkPath === currentPath);
+        document.querySelectorAll("#main-nav .nav-link, #main-nav .dropdown-item").forEach((link) => {
+            const href = link.getAttribute("href");
+            if (!href || href === "#") return;
+
+            const linkPath = new URL(href, window.location.origin).pathname;
+            const isActive = linkPath === currentPath;
+            link.classList.toggle("active", isActive);
+
+            // Si el enlace activo vive dentro de un dropdown (ej. Herramientas),
+            // también resaltamos el toggle del menú para que no parezca que
+            // "ninguna sección" está seleccionada.
+            if (isActive) {
+                const dropdownToggle = link.closest(".dropdown")?.querySelector(".dropdown-toggle");
+                if (dropdownToggle) dropdownToggle.classList.add("active");
+            }
         });
     }
 
